@@ -49,6 +49,10 @@ Entities/fields added or changed (update the domain & data model docs in the sam
 API/operations added or changed (update the API contract). Note the **UI** surface and
 link the UX spec.
 
+> A slice isn't done at the API. Acceptance includes the **client binding** (the call site
+> that consumes the endpoint) and a **UI surface** — or an explicit, logged deferral. An
+> endpoint with no client/UI is a horizontal layer wearing a vertical-slice label.
+
 ## 8. Dependencies
 
 Other features/spikes/ADRs this relies on.

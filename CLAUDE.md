@@ -61,12 +61,28 @@ pure-core/impure-shell, reconcilable idempotent imports, a consistent error enve
   **A failing or skipped test blocks completion.**
 - Before declaring anything done, verify the Definition of Done in
   [`docs/ENGINEERING_STANDARDS.md`](docs/ENGINEERING_STANDARDS.md) §2.
+- **Close out each block with a DoD-shaped snapshot.** At the end of every spike, vertical
+  slice, or phase, write a dated [status report](templates/STATUS-REPORT-TEMPLATE.md) whose
+  **outline is the Definition of Done** — each check ✅/⚠/❌ **with evidence**, plus the
+  test-count delta and a one-line Conventional-Commit summary; deferred checks stay visible
+  (⚠ + reason + owner) so it never overstates "done." Right-size it: a trivial docs/config
+  tweak gets a commit line, not a full report. See
+  [`docs/00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) §9.
+- **Make every Roadmap milestone handoff-ready.** When a Roadmap item reaches `Done`, leave
+  the project ready to resume in a fresh context window: gate green, docs updated, the status
+  report's **Resume here** current — and **end that report with a copy-pasteable
+  "Next-session kickoff prompt"** (the exact prompt to start the next session on the next
+  item). The newest status report is therefore both the handoff and the launch pad; a fresh
+  session should need nothing more than to read it.
 
 ## Documentation discipline
 
 Any change to data shape, interfaces, or architecture updates the corresponding doc **in
-the same change**. New features start from [`templates/`](templates/). ADRs are
-append-only — **supersede, don't edit**.
+the same change** — including overview/summary lines and internal links, which rot first.
+New features start from [`templates/`](templates/). ADRs are append-only — **supersede,
+don't edit**. When something would have been a better **kit** default (a tooling gap, an
+example-code default, doc/process friction), log it in
+[`docs/KIT_FEEDBACK.md`](docs/KIT_FEEDBACK.md) for a later kit pass — don't only fix it locally.
 
 ## Commits & workflow
 

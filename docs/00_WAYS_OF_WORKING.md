@@ -207,6 +207,27 @@ executes a flawed plan flawlessly:
   output. (Reviewing the plan is what catches "no UI is being built" immediately.)
 - **"Is it usable yet?"** is asked at every increment by both parties.
 - **Surprises become spikes**, not silent workarounds.
+- **Close out each block with a Definition-of-Done snapshot.** At the end of every executed
+  block — a spike, a vertical slice, or a phase — write a dated
+  [status report](../templates/STATUS-REPORT-TEMPLATE.md) whose **outline is the Definition
+  of Done** (§5): report each check (vertical & usable · gate-green · acceptance criteria &
+  UX states · accessibility · input-validation & secrets · docs-in-the-same-change) as
+  ✅/⚠/❌ **with evidence**, then the test-count delta and a one-line Conventional-Commit
+  summary. Anything not done stays visible (⚠ + reason + owner) so a snapshot never
+  overstates "done." This is what makes hand-offs between sessions/context windows clean and
+  honest — and it doubles as the per-block review record.
+- **End each milestone handoff-ready, with the next session's kickoff prompt.** When a
+  roadmap item reaches `Done`, the project must be resumable cold: gate green, docs updated,
+  the status report's **Resume here** current. Close that report with a **copy-pasteable
+  "Next-session kickoff prompt"** — the exact text to paste into a fresh context window to
+  start the next item (it specializes the generic *Resume* prompt in
+  [`KICKOFF-PROMPT.md`](../KICKOFF-PROMPT.md): names the next item, its risks, and any new
+  setup). The newest status report is then both the handoff record and the launch pad — a new
+  session reads it and nothing else to get going.
+- **Feed kit-level lessons back.** When something would have been a better *baseline* default
+  (a tooling gap, an example-code default, doc/process friction), log it in
+  [`KIT_FEEDBACK.md`](KIT_FEEDBACK.md) as it surfaces — not only fixed locally — so a later
+  kit pass can fold it into the starter for the next project.
 - Keep the practices that worked: pure-core/impure-shell (so logic is testable without
   I/O), pass/fail gates, gate-green-per-slice, and resumable status reports for clean
   hand-offs between sessions/context windows.
@@ -224,6 +245,12 @@ executes a flawed plan flawlessly:
 - **Data-in-the-Repo** — confidential/real data committed because guardrails came late.
   (Scaffold the `.gitignore` first.)
 - **Build-Without-Use** — large surface with no one having used it. (Usable every step.)
+- **Summary Drift** — overview lines, counts, and internal links rot while the detailed
+  sections stay correct. (Treat overview prose + links as part of "docs updated in the same
+  change"; a link-check helps.)
+- **Documented-but-Unwired Gate** — a DoD/CI that lists lint, e2e, or a11y the scaffold never
+  shipped runnable, so "the gate" overstates enforced rigor. (Ship it runnable from commit
+  zero — the False-Certainty anti-pattern applied to tooling.)
 
 ---
 

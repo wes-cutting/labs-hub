@@ -44,6 +44,7 @@ file when its stage arrives.
 | [`ENGINEERING_STANDARDS.md`](ENGINEERING_STANDARDS.md) | Conventions, the Definition of Done, and opt-in recommended patterns. |
 | [`TESTING_STRATEGY.md`](TESTING_STRATEGY.md) | Test layers and the gate. |
 | [`SECURITY.md`](SECURITY.md) | Secrets, data handling, authn/authz, dependency scanning. |
+| [`KIT_FEEDBACK.md`](KIT_FEEDBACK.md) | A running log of improvements to **this baseline kit** found while building the project, for a later kit pass. Carry the stub; append as lessons surface ([`00_WAYS_OF_WORKING.md`](00_WAYS_OF_WORKING.md) §9). |
 
 ## Per-project folders
 
@@ -54,6 +55,7 @@ file when its stage arrives.
 | `ux/` | One UX spec per user-facing capability (flows + screen states). | [`UX-SPEC-TEMPLATE.md`](../templates/UX-SPEC-TEMPLATE.md) |
 | `spikes/` | One report per investigation (**these come first**). | [`SPIKE-REPORT-TEMPLATE.md`](../templates/SPIKE-REPORT-TEMPLATE.md) |
 | `status-reports/` | Periodic snapshots for clean hand-offs between sessions. | [`STATUS-REPORT-TEMPLATE.md`](../templates/STATUS-REPORT-TEMPLATE.md) |
+| `reviews/` | Point-in-time, repo-wide code reviews; findings tracked as roadmap items. | — |
 
 ## Target `docs/` tree (once a project is underway)
 
@@ -69,11 +71,13 @@ docs/
 ├─ 06_API_CONTRACT.md        # interface contract      (fill-in)
 ├─ 07_NFR.md                 # non-functional / ops    (fill-in · hardening)
 ├─ ARCHITECTURE.md  ENGINEERING_STANDARDS.md  TESTING_STRATEGY.md  SECURITY.md   (carry as-is)
+├─ KIT_FEEDBACK.md           # baseline-kit improvements   (carry stub · append)
 ├─ adr/                      # ADR-0000 meta + ADR-0001… one per decision
 ├─ features/                 # one feature spec per feature
 ├─ ux/                       # one UX spec per user-facing capability
 ├─ spikes/                   # one report per investigation (these come first)
-└─ status-reports/           # periodic hand-off snapshots
+├─ status-reports/           # periodic hand-off snapshots
+└─ reviews/                  # point-in-time repo-wide reviews (findings → roadmap)
 ```
 
 ## How a project starts

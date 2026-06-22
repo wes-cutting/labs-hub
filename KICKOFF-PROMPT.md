@@ -59,6 +59,11 @@ My initial idea (optional): <one or two sentences, or leave blank>
 
 ## Resume an existing project
 
+This is the **generic** cold-start. Once a project is underway, the newest status report
+ends with a **tailored "Next-session kickoff prompt"** for the specific next item
+(docs/00_WAYS_OF_WORKING.md §9) — prefer pasting that. Use the generic one below if there
+isn't a tailored prompt yet.
+
 ```text
 You are resuming work on a project built from the baseline starter kit in this repository,
 in a fresh context window. Get your bearings before doing anything:

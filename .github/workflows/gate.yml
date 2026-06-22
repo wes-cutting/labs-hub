@@ -8,16 +8,24 @@
 #   • A failing OR skipped test blocks the merge — never green on skipped tests.
 #   • Exclude any illustrative / non-product code (e.g. examples/) from typecheck/lint/build.
 #   • Wire a dependency/vulnerability scan (SCA) in early (docs/SECURITY.md §4).
+#   • Wire lint, e2e, AND the a11y scan in the FOUNDATION slice — not deferred to hardening.
+#     A gate that's documented but not runnable is the "False-Certainty Docs" anti-pattern
+#     applied to tooling (docs/KIT_FEEDBACK.md K2/K10). A reference wiring of every step
+#     (lint · Playwright e2e · axe a11y · perf budget · SCA) lives in the budgeteer project.
 #
 # Each step below is a PLACEHOLDER. Replace the `echo` with the real command from your
 # project's README / ADR-0001, then DELETE the `gate-not-configured` guard step.
 # ============================================================================
 name: gate
 
+# Manual-only by default, so a freshly-cloned, not-yet-wired kit never shows a red ✗ on
+# every push — noise that trains people to ignore CI (docs/KIT_FEEDBACK.md K1). Once the
+# steps below are wired to your stack, ENABLE auto-triggers by uncommenting pull_request/push.
 on:
-  pull_request:
-  push:
-    branches: [main] # adjust to your default branch
+  workflow_dispatch:
+  # pull_request:
+  # push:
+  #   branches: [main] # adjust to your default branch
 
 # Cancel superseded runs on the same ref.
 concurrency:
@@ -69,3 +77,9 @@ jobs:
       - name: dependency / vulnerability scan (SCA)
         # e.g. npm audit --audit-level=high / pip-audit / govulncheck
         run: echo "TODO - SCA scan"
+
+      # Optional but cheap: catch broken internal doc links before they ship
+      # (docs/KIT_FEEDBACK.md K14 — overview prose + links rot first). e.g. lychee /
+      # markdown-link-check over docs/ and the top-level *.md.
+      # - name: docs link-check
+      #   run: echo "TODO - link-check (optional)"

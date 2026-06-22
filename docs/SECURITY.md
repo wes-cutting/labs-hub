@@ -33,6 +33,12 @@ own ADRs but never weakens the baseline below.
   concatenation of untrusted input.
 - Return a **consistent error envelope**; never leak stack traces, secrets, or internal
   identifiers in errors.
+- **CORS is an allowlist, never `*`.** A browser app calling the API cross-origin needs CORS
+  headers, but only for **explicitly configured** origins (an env-driven allowlist; dev
+  default = the local web origin), and the allowed **methods** declared explicitly. Widen it
+  deliberately per environment. A missing or over-broad CORS policy is invisible to
+  server-side tests — exercise it with a **real browser→API smoke** (see
+  [`TESTING_STRATEGY.md`](TESTING_STRATEGY.md)).
 
 ## 3. Authentication & authorization
 

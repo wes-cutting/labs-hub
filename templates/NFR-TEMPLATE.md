@@ -62,8 +62,11 @@ Project-specific targets **on top of** the baseline (see
 ## 6. Accessibility
 
 Baseline is **WCAG 2.2 AA** on user-facing surfaces
-([`ENGINEERING_STANDARDS.md`](../docs/ENGINEERING_STANDARDS.md) §2). Record project-specific
-concerns, the audit cadence, and the tools used.
+([`ENGINEERING_STANDARDS.md`](../docs/ENGINEERING_STANDARDS.md) §2). Wire an **automated a11y
+scan** (e.g. axe) into the e2e gate from the **foundation**, failing on serious/critical, and
+ship a baseline accessibility CSS floor (e.g. a minimum interactive target size — browser
+defaults fail WCAG 2.5.8). Record project-specific concerns, the audit cadence, and the tools
+used; manual audits cover what automation can't.
 
 ## 7. Operational readiness
 

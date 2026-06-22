@@ -50,7 +50,7 @@ baseline-starter/
 ├─ ORIGIN.md                        # the lessons this kit encodes
 ├─ .github/
 │  ├─ PULL_REQUEST_TEMPLATE.md      # the Definition of Done as a PR checklist
-│  └─ workflows/gate.yml            # CI gate skeleton (wire to your stack; fails until configured)
+│  └─ workflows/gate.yml            # CI gate skeleton (manual by default; wire steps, then enable triggers)
 ├─ docs/
 │  ├─ README.md                     # doc map / reading order
 │  ├─ 00_WAYS_OF_WORKING.md         # process spine (the lessons as rules)
@@ -59,6 +59,7 @@ baseline-starter/
 │  ├─ ENGINEERING_STANDARDS.md      # conventions + Definition of Done + recommended patterns
 │  ├─ TESTING_STRATEGY.md           # test layers + the gate
 │  ├─ SECURITY.md                   # secrets / data / auth baseline
+│  ├─ KIT_FEEDBACK.md               # baseline-kit improvements (carry stub · append as found)
 │  └─ adr/
 │     ├─ ADR-0000-record-architecture-decisions.md   # how we use ADRs
 │     └─ ADR-TEMPLATE.md
@@ -94,6 +95,9 @@ baseline-starter/
 - **Fill in per project** (from `templates/`): the intake record, PRD, roadmap, feature
   specs, UX specs, domain/data models, API contract, the NFR / operational-readiness doc,
   spikes, status reports, and each stack/decision ADR.
+- **Carry the stub, then append:** `docs/KIT_FEEDBACK.md` — log baseline-kit improvements you
+  discover while building, so a later kit pass can fold them back in
+  ([`docs/00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) §9).
 
 ## Origin
 
