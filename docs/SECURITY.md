@@ -25,6 +25,21 @@ own ADRs but never weakens the baseline below.
 > rewrite — expensive and error-prone. The guardrail belongs in the scaffold, not in a
 > spec written later.
 
+### ETL / bulk-import artifacts are two grades — plan the split when the ETL starts
+
+A real-data extraction or import effort produces two kinds of artifact, and they need
+different treatment from the moment work begins, not caught at review time:
+
+- **Committable:** the tooling itself (extractors, transforms, schema maps) and any
+  **redacted** findings/analysis derived from it.
+- **Gitignored, local-only:** working docs that carry real amounts, names, or other
+  confidential content — even excellent analysis is disqualified from the repo the moment
+  it quotes real data.
+
+Have the ETL write its working docs into a gitignored path **by default** (the scaffold's
+`.gitignore` already excludes `/data/`, `/private/`, `/reports/`) so commit hygiene is
+structural, not a last-minute catch that depends on someone remembering to check.
+
 ## 2. Input & output
 
 - **Validate all external input at the boundary** (requests, files, env, third-party

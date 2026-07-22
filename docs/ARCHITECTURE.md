@@ -53,7 +53,15 @@ logic.** Outer layers may depend on inner layers; inner layers must not depend o
 - Cross-cutting concerns (auth context, tenancy, logging) are passed *in*, not reached
   for from deep inside pure code.
 - Prefer enforcing these with lint rules / module-boundary tooling so they can't quietly
-  erode.
+  erode. The shape: a **per-zone `no-restricted-imports`** block — domain/pure-library code
+  bans the framework, the datastore client, and any `node:*`/platform I/O; presentation code
+  bans the datastore client (and, if the client shares server types via the
+  types-only-contract pattern in [`ENGINEERING_STANDARDS.md`](ENGINEERING_STANDARDS.md) §4,
+  bans every **runtime** import of the server workspace while allowing type-only imports of
+  its `contract.ts`); route/adapter modules ban reaching past their own boundary into
+  another zone's internals. Wire it into the project's lint config from the foundation
+  slice (see [`TESTING_STRATEGY.md`](TESTING_STRATEGY.md) §1) — a boundary rule enforced
+  only by review erodes the first time nobody's looking.
 
 ## 3. What is decided per project (via ADR)
 

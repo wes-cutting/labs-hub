@@ -53,7 +53,8 @@ Discovery names the first spike.
 Adopt when the domain calls for it (see
 [`ENGINEERING_STANDARDS.md`](docs/ENGINEERING_STANDARDS.md) §4), recording the choice in an
 ADR: integer-minor-unit money, derive-don't-store computed state, tenant/owner scoping,
-pure-core/impure-shell, reconcilable idempotent imports, a consistent error envelope.
+pure-core/impure-shell, an injected clock, reconcilable idempotent imports and exports, a
+types-only shared contract, a demo-asset capture pattern, a consistent error envelope.
 
 ## Testing & Definition of Done
 
