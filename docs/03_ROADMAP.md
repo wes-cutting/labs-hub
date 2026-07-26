@@ -15,10 +15,11 @@ roadmap-item: —
 | History       | [`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md) — re-sequencing log + done/shipped ledger |
 | Sources       | [`01_INTAKE.md`](01_INTAKE.md) · [`02_PRD.md`](02_PRD.md) · [`ADR-0001`](adr/ADR-0001-os-and-container-runtime.md) · [`ADR-0002`](adr/ADR-0002-service-data-and-state.md) |
 
-**Current focus:** **SPIKE-05 — hub platform evaluation** (adopt an existing tool vs. build a
-custom hub). It gates LH-S1 because it decides what the foundation slice *is*. Done when the
-must-have matrix is scored on the real Pi and a build-vs-adopt call is made
-([SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md)).
+**Current focus:** **LH-S1 — foundation hub slice** (now unblocked). SPIKE-05 decided:
+**adopt Homepage + Portainer, don't build** ([ADR-0003](adr/ADR-0003-hub-platform.md)). LH-S1
+is now *assemble & configure* the Homepage+Portainer seed stack (already running on the Pi)
+into a proper, reproducible foundation. Needs a feature spec + UX spec (≥`Proposed`) and the
+gate wired before build.
 
 ---
 
@@ -47,14 +48,14 @@ retired, whose gate (if any) has landed.
 
 | Id | Item | Kind | Value | Risk | Gated by | Status | Links (spec · UX · spike) |
 | -- | ---- | ---- | ----- | ---- | -------- | ------ | ------------------------- |
-| LH-S1 | Foundation hub slice — single-login gate + hub shell (list services + health) + bring one service up | slice | High | Med | **SPIKE-05** (adopt-vs-build) | Planned | spec: _todo_ · ux: _todo_ · [SPIKE-01](spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md) · [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
+| LH-S1 | Foundation hub slice — **assemble & configure Homepage + Portainer** (open launcher + label-driven catalog + health + lifecycle) into a reproducible Compose foundation on the data-root | slice | High | Med | ✅ SPIKE-05 (done) → [ADR-0003](adr/ADR-0003-hub-platform.md) | Planned | spec: _todo_ · ux: _todo_ · [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
 
 ### Spikes (risk retirement)
 
 | Id | Item | Kind | Value | Risk | Answers (the question) | Status | Spike report |
 | -- | ---- | ---- | ----- | ---- | ---------------------- | ------ | ------------ |
 | SPIKE-01 | Pi 5 hub + Jellyfin feasibility | spike | High | High | Can the Pi 5 run a hub + Jellyfin transcode with headroom? | **Done (PASS)** | [SPIKE-01](spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md) |
-| SPIKE-05 | **Hub platform: adopt vs. build** | spike | High | High | Does an existing tool (or a light pairing) meet the hub must-haves on the Pi 5, or build custom? | **Next** | [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
+| SPIKE-05 | **Hub platform: adopt vs. build** | spike | High | High | Does an existing tool (or a light pairing) meet the hub must-haves on the Pi 5, or build custom? | **Done (adopt Homepage+Portainer)** | [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
 | SPIKE-02 | SD-card wear vs. external USB-3 SSD | spike | High | Med | Does 24/7 write load justify moving the data root to SSD, and does SSD behave on the Pi 5? | Planned | → `ADR-0002` |
 | SPIKE-03 | At-rest encryption + backup/restore (headless) | spike | High | Med | Can a headless node unlock encrypted data acceptably, and can the data root be backed up **and restored**? | Planned | → `ADR-0002` |
 | SPIKE-04 | Small quantized LLM (~1–3B) on the Pi | spike | Med | High | Is a small LLM usable alongside other services within the CPU/RAM budget? | Deferred | intake §4 #4 |

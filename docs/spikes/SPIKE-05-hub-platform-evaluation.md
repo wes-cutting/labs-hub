@@ -1,7 +1,7 @@
 ---
 id: SPIKE-05
 type: spike
-status: Open
+status: Done
 roadmap-item: LH-S1
 ---
 
@@ -9,11 +9,11 @@ roadmap-item: LH-S1
 
 | Field      | Value                                                                 |
 | ---------- | --------------------------------------------------------------------- |
-| Status     | Open                                                                   |
+| Status     | Done                                                                   |
 | Type       | Integration / feasibility                                             |
 | Owner      | wes-cutting                                                           |
-| Time-box   | 1 day — honor it; deeper eval of the winner becomes its own work      |
-| Date       | —                                                                     |
+| Time-box   | 1 day — honored (single session)                                      |
+| Date       | 2026-07-26                                                             |
 | Blocks     | **LH-S1** (foundation hub slice — decides what it *is*) · possibly `ADR-0003` (hub platform choice) |
 
 ## 1. The question
@@ -69,30 +69,81 @@ scoring, not a bake-off to perfection.
 
 ## 4. Findings
 
-> _To be filled when the spike runs. Fill the matrix per candidate (✅/⚠/❌ + evidence),
-> paste measured idle/added RAM and container counts, and note each tool's extensibility
-> mechanism + multi-user path._
+Ran on the real Pi 5, all four candidates deployed against three real services (Jellyfin,
+Homebox, an nginx placeholder). Footprints measured with `docker stats` (after enabling the
+**memory cgroup** — see below). UI/UX criteria evaluated by the operator in-browser.
 
-### Score matrix (fill in)
+**Prerequisite uncovered (applies platform-wide):** the Pi's **memory cgroup controller was
+disabled by default** (`cgroup.controllers` lacked `memory`), so `docker stats` reported
+`MEM 0B` and per-service memory metrics (M6) were impossible for *any* candidate. Fixed by
+adding `cgroup_enable=memory cgroup_memory=1` to `/boot/firmware/cmdline.txt` + reboot; RAM
+metrics then read correctly. This is also a prerequisite for per-service memory *limits*
+(feeds `07_NFR.md`).
 
-| Candidate | M1 | M2 | M3 | M4 | M5 | M6 | M7 | M8 | Footprint (idle RAM / #containers) |
-| --------- | -- | -- | -- | -- | -- | -- | -- | -- | ---------------------------------- |
-| Cosmos | | | | | | | | | |
-| Portainer | | | | | | | | | |
-| Homepage (+gate) | | | | | | | | | |
-| Dockge | | | | | | | | | |
+### Score matrix
 
-### Confirmed / Invalidated / Surprises
-- …
+| Candidate | M1 catalog(+stopped) | M2 health | M3 gate(multi-user) | M4 widgets/custom | M5 lifecycle | M6 metrics | M7 footprint | M8 self-host/least-priv | Notes |
+| --------- | -- | -- | -- | -- | -- | -- | -- | -- | ----- |
+| **Homepage** | ⚠ launcher tiles (label auto-discovery), not stopped mgmt | ✅ | ❌ no built-in auth | ✅✅ widgets; custom via labels | ❌ launch-only | ⚠ via widget | ✅ ~169 MiB, 1 ctr | ✅ (RO socket possible) | Loved: simple, YAML, auto-discovery |
+| **Portainer** | ✅ all containers incl. stopped | ✅ | ✅ users/teams/RBAC | ⚠ stacks, no widgets | ✅ start/stop/update | ✅ live CPU/RAM (no history) | ✅ ~87 MiB, 1 ctr | ⚠ RW docker socket | Management half of the pairing |
+| **Dockge** | ⚠ compose stacks only | ⚠ basic | ✅ login | ❌ | ✅ (compose) | ✅ per-stack | ✅ light | ⚠ RW socket | **Ruled out** — stack-centric, no launcher/widgets |
+| **Cosmos** | ✅ Servapps | ✅ + **history** | ✅✅ SSO/2FA path | ✅ app-store + custom | ✅ | ✅ system + per-app **history** | ⚠ ~21 MiB* but **privileged + host-net** | ❌ privileged; reverse-proxy SPOF | Most complete on paper; heaviest; assumes domain/public-HTTPS |
+
+\* Cosmos' container RAM understates it — it runs `--privileged` with host networking, spawns
+its own MongoDB, and becomes the reverse proxy the whole access path depends on.
+
+### Confirmed
+- **A launcher + manager pairing (Homepage + Portainer) covers the operator's real needs** on
+  the Pi with a tiny footprint (~256 MiB combined, 2 unprivileged-ish containers) and full
+  transparency.
+- Homepage auto-discovers services from **container labels** — zero per-app routing.
+- Portainer gives lifecycle (start/stop/update) + **live** per-container CPU/RAM (once the
+  cgroup fix landed) behind its own gated admin.
+- Cosmos is genuinely the most *complete* single tool (integrated gate + app-store + historical
+  monitoring) and the only one with a real centralized-SSO path.
+
+### Invalidated / revised
+- **M3 ("single-login gate for the hub") revised.** Hands-on, the operator chose an **open
+  launcher on the trusted LAN + per-app auth**, not a hub gate. M3 is *revised, not failed* —
+  PRD updated; a forward-auth gate (e.g. Authelia) remains an add-later option.
+- Cosmos' strengths (gate + history) land exactly on things the operator **deprioritized**
+  (open launcher fine; "don't over-invest in multi-user"), so they don't justify its costs.
+
+### Surprises / unknowns uncovered
+- The **memory-cgroup prerequisite** above (Pi-wide; now fixed).
+- **Cosmos assumes a domain / public-HTTPS / reverse-proxy model** that fights the LAN-only,
+  CGNAT, no-domain reality (forced into "self-signed + allow local IP" side-paths).
+- Homebox's current image **panics without `HBOX_AUTH_API_KEY_PEPPER` (≥32 bytes)** — noted
+  for whenever Homebox becomes a real service (LH-S3-adjacent).
 
 ## 5. Recommendation / decision
 
-> _To be filled._ Adopt <X> / adopt pairing <X+Y> / build custom. If adopt → draft `ADR-0003`
-> (hub platform) and scope LH-S1 as "stand up + configure <X> as the hub." If build → LH-S1 is
-> "author the hub"; this matrix is its requirements.
+**Adopt the pairing: Homepage (launcher/catalog/health/widgets) + Portainer (lifecycle +
+live per-container metrics). Reject Cosmos and Dockge. Do not build a custom hub.**
 
-## 6. Follow-ups
+Rationale (maps to the operator's decision criteria): open launcher is acceptable → no need
+for Cosmos' gate; "don't over-invest in multi-user" → skip Cosmos' SSO machinery; prioritize
+**resilience + least-privilege** → avoid Cosmos' privileged host-net reverse-proxy SPOF;
+value **simple, transparent pieces** → Homepage YAML + Portainer over an all-in-one.
 
-- [ ] `ADR-0003` (hub platform) if a tool is adopted.
-- [ ] Re-scope LH-S1 from the outcome (assemble-and-configure vs. author).
-- [ ] Note multi-user/SSO growth path for a future ADR (deferred, per operator).
+**Accepted trade-offs (with cheap exits):** no built-in history (add **Beszel** later if
+wanted — far lighter than Cosmos/Grafana; verify ARM64 then); Portainer holds a RW Docker
+socket (mitigate later with a socket-proxy — note in `07_NFR.md`).
+
+→ Draft **`ADR-0003`** (hub platform) at `Validated`; re-scope **LH-S1** as *assemble &
+configure Homepage + Portainer* (not "author a hub").
+
+## 6. Impact on the plan
+
+- **Specs/ADRs:** new `ADR-0003` (Validated) · `02_PRD.md` M3/auth goal + journey revised
+  (open launcher) · `07_NFR.md` to carry the socket-proxy + memory-limit notes.
+- **Scope:** LH-S1 becomes assemble-not-build; a custom hub is explicitly *not* being built.
+- **Sequencing:** LH-S1 unblocked; Homepage + Portainer seed stack kept running on the Pi.
+
+## 7. Follow-ups
+
+- [x] `ADR-0003` (hub platform) — Homepage + Portainer.
+- [x] Re-scope LH-S1 (assemble & configure).
+- [ ] Future: Beszel for historical metrics (if desired); socket-proxy for Portainer (`07_NFR`).
+- [ ] Future: forward-auth gate (Authelia) *if* the multi-user/SSO future arrives (`ADR-0003` growth path).
+- [ ] Homebox needs `HBOX_AUTH_API_KEY_PEPPER` set when it becomes a real service.
