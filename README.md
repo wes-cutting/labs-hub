@@ -1,116 +1,69 @@
-# Baseline Starter Kit
+# labs-hub
 
-A **stack-agnostic, project-agnostic** baseline for new application projects. It captures
-*how we build* — process, standards, templates — so each new project starts from
-hard-won lessons instead of a blank page.
+A **portable, self-hosted hub / control plane** for a personal home-and-van ecosystem — one
+node that **assembles proven services** (Jellyfin, and more) and **hosts custom-built ones**
+behind a single authentication barrier, running on a Raspberry Pi 5 you fully own and
+understand.
 
-> **The stack is a per-project decision.** This kit deliberately does **not** pick a
-> framework, language, or datastore. Each project records its stack in its own
-> `ADR-0001` (or equivalent) after a feasibility/UX spike. The kit provides the
-> *boundaries and process* the stack plugs into.
+> Built from the DrewskiLabs baseline starter kit (see [`KIT-README.md`](KIT-README.md)). This
+> README is a **living project overview** — it grows as the project does.
 
-## How to use it
+## Status
 
-> **Fastest start:** copy the prompt in [`KICKOFF-PROMPT.md`](KICKOFF-PROMPT.md) into a
-> fresh agent session (with this repo open). It drives the steps below for you — beginning
-> with discovery.
+**Phase:** foundation. Discovery and the feasibility spike are complete; the first vertical
+slice (the hub shell) is not yet started.
 
-1. Copy this kit into a new project's repo (or use it as a template repo).
-2. Read [`docs/00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) first — it's the spine.
-3. **Run discovery with the agent** using
-   [`templates/DISCOVERY-GUIDE.md`](templates/DISCOVERY-GUIDE.md); capture it in
-   [`docs/01_INTAKE.md`](docs/01_INTAKE.md). This surfaces the problem, the core bet, and
-   the riskiest assumptions — and **names the first spike**.
-4. Run the **first spikes** (data-profiling and/or value-hypothesis) using
-   [`templates/SPIKE-REPORT-TEMPLATE.md`](templates/SPIKE-REPORT-TEMPLATE.md).
-5. Only then fill in the PRD and project docs from the templates, picking a stack via an ADR.
-6. Build in **vertical slices** (data → API → UI), gate-green each one.
+- **Feasibility:** ✅ validated — [SPIKE-01](docs/spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md)
+  (Pi 5 runs a Docker/Compose hub + Jellyfin transcoding at ~2.8× realtime; **CPU, not RAM, is
+  the ceiling** — no hardware H.264 encode, so live transcoding is effectively single-stream).
+- **Resume from:** the newest status report —
+  [`docs/status-reports/2026-07-26-spike01.md`](docs/status-reports/2026-07-26-spike01.md).
+- **Next:** the foundation hub slice (**LH-S1**) — see [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md).
 
-> **New to the kit?** Skim [`examples/taskjot/`](examples/taskjot/01_INTAKE.md) first — a
-> filled walkthrough of the whole chain (intake → spike → PRD → roadmap → feature + UX spec)
-> for one tiny project.
+## What it is (and isn't)
 
-## The core idea (one line)
+- **Is:** a hub that brings services up/down and shows their health, behind single-user auth,
+  on the van LAN — the custom work lives in the *hub*, not in re-implementing mature services.
+- **Isn't** (current non-goals): multi-user/public, a rebuild of mature services,
+  internet-exposed, an LLM host (yet), or high-availability/multi-node. Full list in
+  [`docs/02_PRD.md`](docs/02_PRD.md) §4.
 
-**Reality before paper; vertical not horizontal; front-load risk; usable every step;
-decided ≠ validated; secure from commit zero.**
+## Stack
 
-## Layout
+Chosen per project via ADRs (see [`docs/adr/`](docs/adr/)):
 
-```
-baseline-starter/
-├─ README.md                        # this file
-├─ CLAUDE.md                        # agent operating guide (stack-agnostic)
-├─ KICKOFF-PROMPT.md                # copy-paste prompt to start/resume with an agent
-├─ CONTRIBUTING.md                  # front door for contributors (human + agent)
-├─ LICENSE                          # MIT
-├─ .gitignore                       # secrets + local/confidential data, from day zero
-├─ .env.example                     # config keys (copy to .env; never commit real secrets)
-├─ .editorconfig                    # consistent whitespace across editors
-├─ ORIGIN.md                        # the lessons this kit encodes
-├─ .github/
-│  ├─ PULL_REQUEST_TEMPLATE.md      # the Definition of Done as a PR checklist
-│  └─ workflows/gate.yml            # CI gate skeleton (manual by default; wire steps, then enable triggers)
-├─ docs/
-│  ├─ README.md                     # doc map / reading order
-│  ├─ 00_WAYS_OF_WORKING.md         # process spine (the lessons as rules)
-│  ├─ 01_INTAKE.md                  # captured discovery (first fill-in, pre-PRD)
-│  ├─ ARCHITECTURE.md               # module boundaries (stack chosen per-project)
-│  ├─ ENGINEERING_STANDARDS.md      # conventions + Definition of Done + recommended patterns
-│  ├─ TESTING_STRATEGY.md           # test layers + the gate
-│  ├─ SECURITY.md                   # secrets / data / auth baseline
-│  ├─ KIT_FEEDBACK.md               # baseline-kit improvements (carry stub · append as found)
-│  └─ adr/
-│     ├─ ADR-0000-record-architecture-decisions.md   # how we use ADRs
-│     └─ ADR-TEMPLATE.md
-├─ templates/
-│  ├─ DISCOVERY-GUIDE.md            # agent's intake-conversation playbook (read, not filled)
-│  ├─ SPIKE-REPORT-TEMPLATE.md      # time-boxed investigations
-│  ├─ UX-SPEC-TEMPLATE.md           # flows + screen states (forces the UI)
-│  ├─ PRD-TEMPLATE.md               # problem / goals / non-goals / journeys
-│  ├─ ROADMAP-TEMPLATE.md           # living, ordered slice/spike backlog (plan of record)
-│  ├─ FEATURE-SPEC-TEMPLATE.md
-│  ├─ DOMAIN-MODEL-TEMPLATE.md
-│  ├─ DATA-MODEL-TEMPLATE.md
-│  ├─ API-CONTRACT-TEMPLATE.md
-│  ├─ NFR-TEMPLATE.md               # non-functional reqs + operational readiness (hardening)
-│  └─ STATUS-REPORT-TEMPLATE.md
-└─ examples/                        # a filled, illustrative walkthrough (NOT built)
-   └─ taskjot/                      # the full doc chain for a tiny toy project
-```
+| Layer | Choice | Decision |
+| ----- | ------ | -------- |
+| Hardware | Raspberry Pi 5 (8GB, ARM64), CanaKit PRO 128GB | fixed constraint |
+| OS | 64-bit Raspberry Pi OS (Debian 12 Bookworm) | [`ADR-0001`](docs/adr/ADR-0001-os-and-container-runtime.md) — **Validated** |
+| Orchestration | Docker Engine + Compose plugin | [`ADR-0001`](docs/adr/ADR-0001-os-and-container-runtime.md) — **Validated** |
+| Service data / state | Single data-root, bind mounts, likely external SSD | [`ADR-0002`](docs/adr/ADR-0002-service-data-and-state.md) — **Proposed** (medium/backup/encryption not yet spiked) |
+| Gate (types/lint/test/build) | _not wired yet_ — to be scaffolded with the foundation slice | — |
 
-> **`examples/`** is a *filled* walkthrough of the doc chain for one toy project
-> (TaskJot) — read it to see what "good" looks like, then start from `templates/`. See
-> [`examples/README.md`](examples/README.md).
+## How we work
 
-## What's a copy vs. a fill-in
+This project follows the kit's process spine — **reality before paper; vertical, not
+horizontal; front-load risk; usable every step; decided ≠ validated; secure from commit zero.**
 
-- **Carry as-is** (the baseline): `docs/00_WAYS_OF_WORKING.md`, `ENGINEERING_STANDARDS.md`,
-  `TESTING_STRATEGY.md`, `SECURITY.md`, `ARCHITECTURE.md`, `CLAUDE.md`, `.gitignore`,
-  `.editorconfig`, `.env.example`, `.github/` (PR template + CI gate skeleton),
-  the ADR meta doc, `KICKOFF-PROMPT.md`, and `templates/DISCOVERY-GUIDE.md` (a read-only
-  playbook).
-  > The scaffolding files (`.github/`, `.env.example`, the gate) are **carried, then
-  > wired to your stack** — fill in the real commands/keys; don't change what they enforce.
-- **Fill in per project** (from `templates/`): the intake record, PRD, roadmap, feature
-  specs, UX specs, domain/data models, API contract, the NFR / operational-readiness doc,
-  spikes, status reports, and each stack/decision ADR.
-- **Carry the stub, then append:** `docs/KIT_FEEDBACK.md` — log baseline-kit improvements you
-  discover while building, so a later kit pass can fold them back in
-  ([`docs/00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) §9).
+- Contributor + agent guide: [`CLAUDE.md`](CLAUDE.md)
+- Process spine (read first): [`docs/00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md)
+- Documentation map: [`docs/README.md`](docs/README.md)
 
-## Origin
+## Documentation
 
-Everything here traces to a specific failure or a practice that worked on a prior
-project. See [`ORIGIN.md`](ORIGIN.md) for the short version and
-[`docs/00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) §10 for the named
-anti-patterns this kit is designed to prevent.
+| Doc | What |
+| --- | ---- |
+| [`docs/01_INTAKE.md`](docs/01_INTAKE.md) | Captured discovery — problem, users, the core bet (Validated) |
+| [`docs/02_PRD.md`](docs/02_PRD.md) | Product requirements — goals, non-goals, journeys, the transcode NFR |
+| [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md) | Living plan of record (+ [history](docs/03_ROADMAP-HISTORY.md)) |
+| [`docs/adr/`](docs/adr/) | Architecture decisions (stack + data/state) |
+| [`docs/spikes/`](docs/spikes/) | Time-boxed investigations (feasibility proven here) |
+| [`docs/status-reports/`](docs/status-reports/) | Point-in-time hand-off snapshots (start from the newest) |
+| [`docs/KIT_FEEDBACK.md`](docs/KIT_FEEDBACK.md) | Improvements fed back to the baseline kit as we build |
 
-## Contributing
+## Operating notes
 
-This kit assumes a human + AI-agent pair. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the
-short front door and [`CLAUDE.md`](CLAUDE.md) for the agent operating guide.
-
-## License
-
-[MIT](LICENSE) © DrewskiLabs.
+- **Target host:** Raspberry Pi 5 on the LAN (currently `192.168.1.185`, Wi-Fi), reached over
+  key-based SSH. mDNS `raspberrypi.local` did not resolve — use the IP.
+- **Growing the kit is a co-deliverable:** friction found while building is logged in
+  [`docs/KIT_FEEDBACK.md`](docs/KIT_FEEDBACK.md) for a later kit pass.
