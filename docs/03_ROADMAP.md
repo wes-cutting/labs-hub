@@ -15,9 +15,10 @@ roadmap-item: —
 | History       | [`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md) — re-sequencing log + done/shipped ledger |
 | Sources       | [`01_INTAKE.md`](01_INTAKE.md) · [`02_PRD.md`](02_PRD.md) · [`ADR-0001`](adr/ADR-0001-os-and-container-runtime.md) · [`ADR-0002`](adr/ADR-0002-service-data-and-state.md) |
 
-**Current focus:** **LH-S1 — the foundation hub slice** (auth barrier + hub shell listing
-services & health + bring-one-service-up). Not yet `Ready`: it needs a feature spec + UX spec
-(at least `Proposed`) and the stack scaffold with the gate wired (`ADR-0001`) before build.
+**Current focus:** **SPIKE-05 — hub platform evaluation** (adopt an existing tool vs. build a
+custom hub). It gates LH-S1 because it decides what the foundation slice *is*. Done when the
+must-have matrix is scored on the real Pi and a build-vs-adopt call is made
+([SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md)).
 
 ---
 
@@ -46,13 +47,14 @@ retired, whose gate (if any) has landed.
 
 | Id | Item | Kind | Value | Risk | Gated by | Status | Links (spec · UX · spike) |
 | -- | ---- | ---- | ----- | ---- | -------- | ------ | ------------------------- |
-| LH-S1 | Foundation hub slice — auth barrier + hub shell (list services + health) + bring one service up | slice | High | Med | — (feasibility retired by SPIKE-01) | Planned | spec: _todo_ · ux: _todo_ · [SPIKE-01](spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md) |
+| LH-S1 | Foundation hub slice — single-login gate + hub shell (list services + health) + bring one service up | slice | High | Med | **SPIKE-05** (adopt-vs-build) | Planned | spec: _todo_ · ux: _todo_ · [SPIKE-01](spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md) · [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
 
 ### Spikes (risk retirement)
 
 | Id | Item | Kind | Value | Risk | Answers (the question) | Status | Spike report |
 | -- | ---- | ---- | ----- | ---- | ---------------------- | ------ | ------------ |
 | SPIKE-01 | Pi 5 hub + Jellyfin feasibility | spike | High | High | Can the Pi 5 run a hub + Jellyfin transcode with headroom? | **Done (PASS)** | [SPIKE-01](spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md) |
+| SPIKE-05 | **Hub platform: adopt vs. build** | spike | High | High | Does an existing tool (or a light pairing) meet the hub must-haves on the Pi 5, or build custom? | **Next** | [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
 | SPIKE-02 | SD-card wear vs. external USB-3 SSD | spike | High | Med | Does 24/7 write load justify moving the data root to SSD, and does SSD behave on the Pi 5? | Planned | → `ADR-0002` |
 | SPIKE-03 | At-rest encryption + backup/restore (headless) | spike | High | Med | Can a headless node unlock encrypted data acceptably, and can the data root be backed up **and restored**? | Planned | → `ADR-0002` |
 | SPIKE-04 | Small quantized LLM (~1–3B) on the Pi | spike | Med | High | Is a small LLM usable alongside other services within the CPU/RAM budget? | Deferred | intake §4 #4 |
@@ -63,6 +65,19 @@ retired, whose gate (if any) has landed.
 | -- | ---- | ---- | ----- | ---- | -------- | ------ | ----------------- |
 | LH-S2 | Assemble **Jellyfin** into the hub (media), within the single-stream transcode budget | slice | High | Med | LH-S1 | Planned | _todo_ |
 | LH-S3 | **Custom-service** deployment through the hub (same mechanism as assembled) | slice | High | Med | LH-S1 | Planned | _todo_ |
+
+> **LH-S2 note — direct-play vs. transcode (address when the Jellyfin slice starts):**
+> Direct-play (no live transcode → avoids the SPIKE-01 CPU ceiling) is decided by **all** of:
+> container, **video codec**, **audio codec** (DTS/TrueHD are common hidden triggers),
+> **subtitles** (image subs like PGS/VOBSUB force a *full* video transcode), and **bitrate**
+> (a client cap below the source transcodes even when codecs match) — **and by the client.**
+> `.mkv` alone does *not* guarantee direct-play (browsers can't direct-play `.mkv` at all).
+> Safe browser target: **`.mp4` + H.264 + AAC + text (SRT) subs** at/under the playback cap.
+> Native Jellyfin apps (TV/phone) decode far more and may direct-play the existing library
+> untouched. **Open question feeding this slice + `07_NFR.md`:** which client devices will
+> actually be used (browser vs. native apps)? — that determines how big the transcode
+> constraint really is. "Pre-optimized library" = storing media in the client-friendly combo
+> so the Pi never transcodes live.
 
 ### Hardening
 
