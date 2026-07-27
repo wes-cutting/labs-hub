@@ -69,3 +69,16 @@ Thumbs.db
 # Agent-spawned worktrees (K28): ESLint doesn't honor .gitignore, but a stale worktree left
 # behind by a tool session shouldn't be tracked either way — and this line is the reminder.
 **/worktrees/**
+
+# ============================================================================
+# HOMEPAGE runtime/generated config (LH-S1)
+# Homepage auto-creates config files it's missing (e.g. kubernetes.yaml) and writes
+# into its bind-mounted config dir. Track ONLY the files we manage so the git-based
+# deploy clone's working tree stays clean.
+# ============================================================================
+deploy/homepage/config/*
+!deploy/homepage/config/settings.yaml
+!deploy/homepage/config/docker.yaml
+!deploy/homepage/config/services.yaml
+!deploy/homepage/config/widgets.yaml
+!deploy/homepage/config/bookmarks.yaml
