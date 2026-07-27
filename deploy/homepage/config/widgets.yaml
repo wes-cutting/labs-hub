@@ -1,0 +1,7 @@
+---
+# At-a-glance system resources (proves the memory-cgroup fix end-to-end).
+- resources:
+    label: System
+    cpu: true
+    memory: true
+    disk: /

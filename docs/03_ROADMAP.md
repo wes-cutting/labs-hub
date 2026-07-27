@@ -15,11 +15,11 @@ roadmap-item: —
 | History       | [`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md) — re-sequencing log + done/shipped ledger |
 | Sources       | [`01_INTAKE.md`](01_INTAKE.md) · [`02_PRD.md`](02_PRD.md) · [`ADR-0001`](adr/ADR-0001-os-and-container-runtime.md) · [`ADR-0002`](adr/ADR-0002-service-data-and-state.md) |
 
-**Current focus:** **LH-S1 — foundation hub slice** (now unblocked). SPIKE-05 decided:
-**adopt Homepage + Portainer, don't build** ([ADR-0003](adr/ADR-0003-hub-platform.md)). LH-S1
-is now *assemble & configure* the Homepage+Portainer seed stack (already running on the Pi)
-into a proper, reproducible foundation. Needs a feature spec + UX spec (≥`Proposed`) and the
-gate wired before build.
+**Current focus:** **LH-S2 — Jellyfin as a managed service** (next). **LH-S1 is done**: the
+Homepage + Portainer foundation is defined in `deploy/`, gate-green (`make gate`) with CI
+wired, running on the Pi from the tracked definition, and auto-discovering services
+([FEAT-LH-S1](features/LH-S1-hub-foundation.md)). One carry: git-based deploy activation
+(push + make repo public + clone on Pi) — mechanism built, awaiting the operator's push.
 
 ---
 
@@ -48,7 +48,7 @@ retired, whose gate (if any) has landed.
 
 | Id | Item | Kind | Value | Risk | Gated by | Status | Links (spec · UX · spike) |
 | -- | ---- | ---- | ----- | ---- | -------- | ------ | ------------------------- |
-| LH-S1 | Foundation hub slice — **assemble & configure Homepage + Portainer** (open launcher + label-driven catalog + health + lifecycle) into a reproducible Compose foundation on the data-root | slice | High | Med | ✅ SPIKE-05 (done) → [ADR-0003](adr/ADR-0003-hub-platform.md) | Planned | spec: _todo_ · ux: _todo_ · [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
+| LH-S1 | Foundation hub slice — Homepage + Portainer as a reproducible Compose foundation (`deploy/`), gate + CI wired, auto-discovery | slice | High | Med | ✅ SPIKE-05 → [ADR-0003](adr/ADR-0003-hub-platform.md) | **Done** (carry: git-deploy activation) | [FEAT-LH-S1](features/LH-S1-hub-foundation.md) (feature+UX) · [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) |
 
 ### Spikes (risk retirement)
 

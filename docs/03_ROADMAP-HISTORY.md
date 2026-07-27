@@ -28,5 +28,6 @@ Never edit past entries; append a new one. This doc only grows.
 
 | Id | Item | Shipped | Notes |
 | -- | ---- | ------- | ----- |
+| LH-S1 | Hub foundation (Homepage + Portainer) | 2026-07-26 | `deploy/` Compose foundation; `make gate` green + CI wired; running on the Pi from the tracked def; auto-discovers Jellyfin/Homebox (RO socket). Carry: git-deploy activation (public repo push). [FEAT-LH-S1](features/LH-S1-hub-foundation.md). |
 | SPIKE-05 | Hub platform: adopt vs. build | 2026-07-26 | **Adopt Homepage + Portainer** (reject Cosmos/Dockge; don't build). Report: [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md) → [ADR-0003](adr/ADR-0003-hub-platform.md). |
 | SPIKE-01 | Pi 5 hub + Jellyfin feasibility | 2026-07-26 | PASS — ~2.8× realtime single transcode, 75 °C, no throttle, ~6.8 GB free; CPU is the ceiling. Report: [SPIKE-01](spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md). |

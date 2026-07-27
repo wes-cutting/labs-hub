@@ -1,33 +1,22 @@
 # ============================================================================
-# CI gate — carry as-is, then wire each step to your stack's real commands.
+# CI gate — labs-hub. Wired to the stack (ADR-0001: Docker/Compose infra).
+# Mirrors the local gate (`make gate`), same checks/order:
+#   lint (yamllint) -> validate (docker compose config) -> shellcheck
 #
-# This MUST run the SAME gate as local, in the SAME order (docs/TESTING_STRATEGY.md §3):
-#   types/typecheck → lint → format check → unit + integration → e2e (incl. a11y) → build
-#
-# Rules this skeleton encodes:
-#   • A failing OR skipped test blocks the merge — never green on skipped tests.
-#   • Exclude any illustrative / non-product code (e.g. examples/) from typecheck/lint/build.
-#   • Wire a dependency/vulnerability scan (SCA) in early (docs/SECURITY.md §4).
-#   • Wire lint, e2e, AND the a11y scan in the FOUNDATION slice — not deferred to hardening.
-#     A gate that's documented but not runnable is the "False-Certainty Docs" anti-pattern
-#     applied to tooling (docs/KIT_FEEDBACK.md K2/K10). A reference wiring of every step
-#     (lint · Playwright e2e · axe a11y · perf budget · SCA) lives in the budgeteer project.
-#
-# Each step below is a PLACEHOLDER. Replace the `echo` with the real command from your
-# project's README / ADR-0001, then DELETE the `gate-not-configured` guard step.
+# Notes:
+#   - No app code yet (LH-S1 is assemble-and-configure), so there is no typecheck/
+#     unit/build step to run. The SMOKE test (Homepage + Portainer reachable) runs
+#     ON THE PI post-deploy, not in CI — CI has no docker socket / running services.
+#   - Add SCA (e.g. trivy image scan) and app-test steps as real code/images land.
 # ============================================================================
 name: gate
 
-# Manual-only by default, so a freshly-cloned, not-yet-wired kit never shows a red ✗ on
-# every push — noise that trains people to ignore CI (docs/KIT_FEEDBACK.md K1). Once the
-# steps below are wired to your stack, ENABLE auto-triggers by uncommenting pull_request/push.
 on:
   workflow_dispatch:
-  # pull_request:
-  # push:
-  #   branches: [main] # adjust to your default branch
+  pull_request:
+  push:
+    branches: [main]
 
-# Cancel superseded runs on the same ref.
 concurrency:
   group: gate-${{ github.ref }}
   cancel-in-progress: true
@@ -38,48 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Fails CI until the gate is wired — so a skeleton never reports a false "green"
-      # (docs/00_WAYS_OF_WORKING.md §10, "False-Certainty Docs"). Delete once configured.
-      - name: gate-not-configured
+      - name: lint (yamllint)
+        run: pipx run yamllint deploy/
+
+      - name: validate (docker compose config)
+        run: docker compose -f deploy/compose.yml config -q
+
+      - name: shellcheck
         run: |
-          echo "::error::CI gate is a skeleton. Wire each step to your stack's commands"
-          echo "::error::(docs/TESTING_STRATEGY.md §3), then delete this guard step."
-          exit 1
-
-      # --- Set up your toolchain (runtime, package manager, dependency cache) ---
-      # - uses: actions/setup-node@v4        # or setup-python / setup-go / setup-java …
-      #   with: { node-version: '20', cache: 'npm' }
-      # - run: <install from the lockfile, e.g. `npm ci`>
-
-      - name: types / typecheck
-        # e.g. tsc --noEmit
-        run: echo "TODO - typecheck"
-
-      - name: lint
-        # e.g. eslint .
-        run: echo "TODO - lint"
-
-      - name: format check
-        # e.g. prettier --check .
-        run: echo "TODO - format check"
-
-      - name: unit + integration
-        # no skipped tests; ephemeral deps boot here
-        run: echo "TODO - unit and integration tests"
-
-      - name: e2e (incl. accessibility scan)
-        # accessibility scan on critical journeys
-        run: echo "TODO - e2e and a11y"
-
-      - name: build
-        run: echo "TODO - build"
-
-      - name: dependency / vulnerability scan (SCA)
-        # e.g. npm audit --audit-level=high / pip-audit / govulncheck
-        run: echo "TODO - SCA scan"
-
-      # Optional but cheap: catch broken internal doc links before they ship
-      # (docs/KIT_FEEDBACK.md K14 — overview prose + links rot first). e.g. lychee /
-      # markdown-link-check over docs/ and the top-level *.md.
-      # - name: docs link-check
-      #   run: echo "TODO - link-check (optional)"
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          shellcheck scripts/*.sh

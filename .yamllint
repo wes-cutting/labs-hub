@@ -1,0 +1,13 @@
+# yamllint config for the gate. Relaxed to fit Compose/Homepage YAML without noise.
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  document-start: disable
+  comments:
+    min-spaces-from-content: 1
+  truthy:
+    allowed-values: ["true", "false"]
+    check-keys: false

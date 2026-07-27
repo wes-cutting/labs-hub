@@ -1,0 +1,35 @@
+name: labs-hub
+
+# labs-hub HUB foundation (LH-S1) — see docs/features/LH-S1-hub-foundation.md.
+#   Homepage  = launcher / service catalog / health / resources (open on the LAN)
+#   Portainer = container lifecycle + live per-service CPU/RAM (admin-gated)
+# Deploy: git-based — see deploy/README.md. Persistence per ADR-0002 (data-root).
+# Images are :latest (as validated in SPIKE-05); pin to a version/digest for stricter
+# reproducibility once you settle on one (see deploy/README.md).
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Homepage refuses requests whose Host isn't allow-listed. Set in deploy/.env.
+      HOMEPAGE_ALLOWED_HOSTS: ${HOMEPAGE_ALLOWED_HOSTS:-192.168.1.185:3000}
+    volumes:
+      - ./homepage/config:/app/config
+      # Read-only socket: discovery only (least privilege).
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      # Read-write socket: required for lifecycle management. Future hardening:
+      # front with a socket-proxy to narrow the API surface (see 07_NFR).
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${LABS_HUB_DATA_ROOT:-/srv/labs-hub}/portainer/data:/data
