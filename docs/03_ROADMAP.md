@@ -15,11 +15,13 @@ roadmap-item: —
 | History       | [`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md) — re-sequencing log + done/shipped ledger |
 | Sources       | [`01_INTAKE.md`](01_INTAKE.md) · [`02_PRD.md`](02_PRD.md) · [`ADR-0001`](adr/ADR-0001-os-and-container-runtime.md) · [`ADR-0002`](adr/ADR-0002-service-data-and-state.md) |
 
-**Current focus:** **LH-S3 — custom-service deployment pattern** (next). **LH-S1 (hub) and
-LH-S2 (Jellyfin) are done and deployed**: the hub (Homepage + Portainer) and Jellyfin run on
-the Pi from the tracked `deploy/` (Compose per service: `compose.yml` + `compose.media.yml`),
-gate-green with CI, data on the `ADR-0002` data-root, auto-discovered on the launcher
-([FEAT-LH-S1](features/LH-S1-hub-foundation.md) · [FEAT-LH-S2](features/LH-S2-jellyfin.md)).
+**Current focus:** **LH-S3 is BLOCKED** — the chosen first custom app (budgeteer) has no
+authentication and holds real financial data, so it cannot be exposed on the LAN until it has
+its own auth. That auth work lives in the **budgeteer repo** (its roadmap #19), not here. So
+the recommended next labs-hub work is **SPIKE-02/03** (SSD + at-rest encryption/backup) —
+now more urgent because budgeteer's sensitive data will land on the Pi. (LH-S1 hub + LH-S2
+Jellyfin are done and deployed: tracked `deploy/`, gate-green with CI, data on the data-root,
+auto-discovered — [FEAT-LH-S1](features/LH-S1-hub-foundation.md) · [FEAT-LH-S2](features/LH-S2-jellyfin.md).)
 
 ---
 
@@ -65,7 +67,7 @@ retired, whose gate (if any) has landed.
 | Id | Item | Kind | Value | Risk | Gated by | Status | Links (spec · UX) |
 | -- | ---- | ---- | ----- | ---- | -------- | ------ | ----------------- |
 | LH-S2 | **Jellyfin** as a managed service (`compose.media.yml`, data-root, labels), within the single-stream transcode budget | slice | High | Med | LH-S1 | **Done** | [FEAT-LH-S2](features/LH-S2-jellyfin.md) |
-| LH-S3 | **Custom-service** deployment through the hub (same mechanism as assembled) | slice | High | Med | LH-S1 | Planned | _todo_ |
+| LH-S3 | **Deploy budgeteer** (first custom app) — CI→GHCR ARM64 image + **Postgres container** + web, on data-root/labels/`/health`. **Gated on budgeteer having its own auth** (write-open financial data). | slice | High | High | **budgeteer auth epic (budgeteer roadmap #19)** · LH-S1 | **Blocked** | see LH-S3 note below |
 
 > **LH-S2 note — direct-play vs. transcode (address when the Jellyfin slice starts):**
 > Direct-play (no live transcode → avoids the SPIKE-01 CPU ceiling) is decided by **all** of:
@@ -79,6 +81,20 @@ retired, whose gate (if any) has landed.
 > actually be used (browser vs. native apps)? — that determines how big the transcode
 > constraint really is. "Pre-optimized library" = storing media in the client-friendly combo
 > so the Pi never transcodes live.
+
+> **LH-S3 note — budgeteer (first custom app), and the auth-before-exposure rule:**
+> Analysis of the sibling `budgeteer` project (TS monorepo: Fastify API `:3001` with `/health`,
+> React+Vite web, PGlite/Postgres, migrations at startup) found it has **no authentication**
+> and holds **real financial data** — its own `.env.example` names serving it on the network as
+> the trigger to build auth. **Decision:** budgeteer gets its **own auth first** (its roadmap
+> #19), in the budgeteer repo, *before* LH-S3 deploys it. **Decided deploy shape (for when
+> unblocked):** build the image in **CI → GHCR (ARM64)**, Pi **pulls** it (the reusable
+> custom-service pattern → formal `ADR-0004` written at build time, validated); a **Postgres
+> container** for state; API + web static; data on the data-root; Homepage labels; `/health`
+> in smoke. **General rule this establishes:** *a custom service that handles sensitive data
+> must have default-deny auth before it is exposed on the LAN* (candidate for `SECURITY.md`).
+> This also raises the priority of **SPIKE-03** (at-rest encryption + backup/restore) — a
+> stealable van node will now hold financial data.
 
 ### Hardening
 
