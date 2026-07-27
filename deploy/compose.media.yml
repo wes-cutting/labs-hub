@@ -1,0 +1,26 @@
+# labs-hub media service (LH-S2) — Jellyfin. See docs/features/LH-S2-jellyfin.md.
+# Composed alongside the hub: `docker compose -f deploy/compose.yml -f deploy/compose.media.yml`
+# (the Makefile does this). Project name + env come from compose.yml.
+# Persistence per ADR-0002 (data-root). Image :latest as validated (pin when settled).
+#
+# TRANSCODE BUDGET (SPIKE-01): the Pi 5 has no HW H.264 encoder — one live 1080p transcode
+# ≈ all 4 cores. Cap concurrent transcodes and favor direct-play (see deploy/README.md).
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    volumes:
+      - ${LABS_HUB_DATA_ROOT:-/srv/labs-hub}/jellyfin/config:/config
+      - ${LABS_HUB_DATA_ROOT:-/srv/labs-hub}/jellyfin/cache:/cache
+      # Media mounted read-only (least privilege — Jellyfin stores metadata in /config).
+      - ${LABS_HUB_MEDIA_ROOT:-/srv/labs-hub/media}:/media:ro
+    labels:
+      - "homepage.group=Media"
+      - "homepage.name=Jellyfin"
+      - "homepage.icon=jellyfin.png"
+      - "homepage.href=http://192.168.1.185:8096"
+      - "homepage.description=Media server"

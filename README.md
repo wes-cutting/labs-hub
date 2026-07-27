@@ -18,9 +18,10 @@ the **hub foundation (LH-S1) is running on the Pi** from a tracked, gate-green C
   the ceiling** — no hardware H.264 encode, so live transcoding is effectively single-stream).
 - **Hub platform:** ✅ decided — adopt **Homepage + Portainer** ([ADR-0003](docs/adr/ADR-0003-hub-platform.md), [SPIKE-05](docs/spikes/SPIKE-05-hub-platform-evaluation.md)).
 - **Foundation (LH-S1):** ✅ built — `deploy/` Compose foundation, `make gate` green + CI wired, running on the Pi, auto-discovering services ([FEAT-LH-S1](docs/features/LH-S1-hub-foundation.md)).
+- **Jellyfin (LH-S2):** ✅ built — managed service in `deploy/compose.media.yml`, data on the data-root, discovered on the hub, within the transcode budget ([FEAT-LH-S2](docs/features/LH-S2-jellyfin.md)).
 - **Resume from:** the newest status report —
-  [`docs/status-reports/2026-07-26-lh-s1.md`](docs/status-reports/2026-07-26-lh-s1.md).
-- **Next:** **LH-S2** — Jellyfin as a managed service — see [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md).
+  [`docs/status-reports/2026-07-26-lh-s2.md`](docs/status-reports/2026-07-26-lh-s2.md).
+- **Next:** **LH-S3** — the custom-service deployment pattern — see [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md).
 
 ## What it is (and isn't)
 

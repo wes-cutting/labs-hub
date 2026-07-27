@@ -21,15 +21,28 @@ cp deploy/.env.example deploy/.env
 $EDITOR deploy/.env          # set HOMEPAGE_ALLOWED_HOSTS to how you reach the Pi
 
 # 3. Data-root (ADR-0002):
-sudo mkdir -p /srv/labs-hub/portainer/data
+sudo mkdir -p /srv/labs-hub/portainer/data \
+              /srv/labs-hub/jellyfin/config /srv/labs-hub/jellyfin/cache \
+              /srv/labs-hub/media          # drop media here (LABS_HUB_MEDIA_ROOT)
 
 # 4. Bring it up:
 docker compose -f deploy/compose.yml up -d
 scripts/smoke.sh localhost
 ```
 
-Then open **Homepage** at `http://<pi>:3000` and **Portainer** at `http://<pi>:9000`
-(first visit creates the Portainer admin — see the token note below).
+Then open **Homepage** at `http://<pi>:3000`, **Portainer** at `http://<pi>:9000`
+(first visit creates the Portainer admin — see the token note below), and **Jellyfin** at
+`http://<pi>:8096` (first visit creates the Jellyfin admin + library from `/media`).
+
+### Jellyfin transcode budget (required — SPIKE-01)
+
+The Pi 5 has **no hardware H.264 encoder**, so one live 1080p transcode ≈ all four cores. To
+stop a second stream from tanking the node, after Jellyfin first-run:
+
+- **Cap concurrent streams/transcodes** — Dashboard → Users → (each user) → set a
+  **simultaneous stream limit** (default to **1** on this hardware).
+- **Favor direct-play** — keep media in client-friendly formats; avoid forcing transcodes.
+- Future hardening: enable HW-accelerated HEVC **decode** (V4L2) to widen the budget.
 
 ## Everyday deploy
 

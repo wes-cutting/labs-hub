@@ -29,5 +29,6 @@ check() { # name url expected_code
 check "Homepage" "http://$HOST:3000/api/healthcheck" "200"
 # Portainer's / redirects (307) depending on state; /api/status is the stable health endpoint.
 check "Portainer" "http://$HOST:9000/api/status" "200"
+check "Jellyfin" "http://$HOST:8096/health" "200"
 
 exit "$fail"

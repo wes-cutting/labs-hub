@@ -15,11 +15,11 @@ roadmap-item: —
 | History       | [`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md) — re-sequencing log + done/shipped ledger |
 | Sources       | [`01_INTAKE.md`](01_INTAKE.md) · [`02_PRD.md`](02_PRD.md) · [`ADR-0001`](adr/ADR-0001-os-and-container-runtime.md) · [`ADR-0002`](adr/ADR-0002-service-data-and-state.md) |
 
-**Current focus:** **LH-S2 — Jellyfin as a managed service** (next). **LH-S1 is done and
-deployed**: the Homepage + Portainer foundation is defined in `deploy/`, gate-green
-(`make gate`) with CI wired, and **running on the Pi from a real `git clone`** of the (public)
-repo — `make deploy` (pull + up + smoke) is green and it auto-discovers services
-([FEAT-LH-S1](features/LH-S1-hub-foundation.md)).
+**Current focus:** **LH-S3 — custom-service deployment pattern** (next). **LH-S1 (hub) and
+LH-S2 (Jellyfin) are done and deployed**: the hub (Homepage + Portainer) and Jellyfin run on
+the Pi from the tracked `deploy/` (Compose per service: `compose.yml` + `compose.media.yml`),
+gate-green with CI, data on the `ADR-0002` data-root, auto-discovered on the launcher
+([FEAT-LH-S1](features/LH-S1-hub-foundation.md) · [FEAT-LH-S2](features/LH-S2-jellyfin.md)).
 
 ---
 
@@ -64,7 +64,7 @@ retired, whose gate (if any) has landed.
 
 | Id | Item | Kind | Value | Risk | Gated by | Status | Links (spec · UX) |
 | -- | ---- | ---- | ----- | ---- | -------- | ------ | ----------------- |
-| LH-S2 | Assemble **Jellyfin** into the hub (media), within the single-stream transcode budget | slice | High | Med | LH-S1 | Planned | _todo_ |
+| LH-S2 | **Jellyfin** as a managed service (`compose.media.yml`, data-root, labels), within the single-stream transcode budget | slice | High | Med | LH-S1 | **Done** | [FEAT-LH-S2](features/LH-S2-jellyfin.md) |
 | LH-S3 | **Custom-service** deployment through the hub (same mechanism as assembled) | slice | High | Med | LH-S1 | Planned | _todo_ |
 
 > **LH-S2 note — direct-play vs. transcode (address when the Jellyfin slice starts):**
