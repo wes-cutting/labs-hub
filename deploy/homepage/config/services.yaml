@@ -1,0 +1,4 @@
+---
+# Intentionally empty. Services are auto-discovered from container `homepage.*`
+# labels via the docker provider (docker.yaml). Add manual/static service groups
+# here only for things not represented as labelled containers.

@@ -1,0 +1,5 @@
+---
+title: labs-hub
+headerStyle: clean
+# Status shown as text + icon (not colour alone) for accessibility.
+statusStyle: "basic"

@@ -10,15 +10,17 @@ understand.
 
 ## Status
 
-**Phase:** foundation. Discovery and the feasibility spike are complete; the first vertical
-slice (the hub shell) is not yet started.
+**Phase:** foundation built. Discovery, feasibility, and the hub-platform choice are done, and
+the **hub foundation (LH-S1) is running on the Pi** from a tracked, gate-green Compose definition.
 
 - **Feasibility:** ✅ validated — [SPIKE-01](docs/spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md)
   (Pi 5 runs a Docker/Compose hub + Jellyfin transcoding at ~2.8× realtime; **CPU, not RAM, is
   the ceiling** — no hardware H.264 encode, so live transcoding is effectively single-stream).
+- **Hub platform:** ✅ decided — adopt **Homepage + Portainer** ([ADR-0003](docs/adr/ADR-0003-hub-platform.md), [SPIKE-05](docs/spikes/SPIKE-05-hub-platform-evaluation.md)).
+- **Foundation (LH-S1):** ✅ built — `deploy/` Compose foundation, `make gate` green + CI wired, running on the Pi, auto-discovering services ([FEAT-LH-S1](docs/features/LH-S1-hub-foundation.md)).
 - **Resume from:** the newest status report —
-  [`docs/status-reports/2026-07-26-spike01.md`](docs/status-reports/2026-07-26-spike01.md).
-- **Next:** the foundation hub slice (**LH-S1**) — see [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md).
+  [`docs/status-reports/2026-07-26-lh-s1.md`](docs/status-reports/2026-07-26-lh-s1.md).
+- **Next:** **LH-S2** — Jellyfin as a managed service — see [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md).
 
 ## What it is (and isn't)
 
@@ -38,7 +40,8 @@ Chosen per project via ADRs (see [`docs/adr/`](docs/adr/)):
 | OS | 64-bit Raspberry Pi OS (Debian 12 Bookworm) | [`ADR-0001`](docs/adr/ADR-0001-os-and-container-runtime.md) — **Validated** |
 | Orchestration | Docker Engine + Compose plugin | [`ADR-0001`](docs/adr/ADR-0001-os-and-container-runtime.md) — **Validated** |
 | Service data / state | Single data-root, bind mounts, likely external SSD | [`ADR-0002`](docs/adr/ADR-0002-service-data-and-state.md) — **Proposed** (medium/backup/encryption not yet spiked) |
-| Gate (types/lint/test/build) | _not wired yet_ — to be scaffolded with the foundation slice | — |
+| Gate | `make gate` (yamllint + `docker compose config` + shellcheck) + smoke; CI in `.github/workflows/gate.yml` | wired (LH-S1) |
+| Hub | Homepage (launcher/catalog/health) + Portainer (lifecycle/metrics), in `deploy/` | [ADR-0003](docs/adr/ADR-0003-hub-platform.md) — **Validated** |
 
 ## How we work
 

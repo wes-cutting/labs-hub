@@ -36,8 +36,11 @@ is proven.
 
 ## 3. Goals
 
-1. A **hub / control plane** that can bring services up/down and show their **health**, behind
-   a **single-user authentication barrier**.
+1. A **hub / control plane** that can bring services up/down and show their **health**. The
+   launcher is **open on the trusted van LAN**; **services keep their own logins** (per-app
+   auth). *(Revised by [SPIKE-05](spikes/SPIKE-05-hub-platform-evaluation.md)/[ADR-0003](adr/ADR-0003-hub-platform.md)
+   — a hub-level auth gate is an add-later option, not a launch requirement.)* The management
+   console (Portainer) is itself gated.
 2. **Assemble proven services** into the hub — first Jellyfin (media).
 3. Deploy **custom-built services** through the same mechanism as assembled ones.
 4. Operate reliably within the **Pi-5 + van envelope** (thermal/CPU headroom respected,
@@ -75,8 +78,9 @@ so as the catalog grows, without the node falling over.
 
 Named end-to-end flows (these drive e2e tests):
 
-1. **Sign in to the hub** — operator opens the hub on the van LAN, authenticates, lands on the
-   service dashboard (default-deny: unauthenticated sees nothing).
+1. **Open the hub** — operator opens the launcher (Homepage) on the van LAN and lands on the
+   service dashboard. *(Open on the trusted LAN per ADR-0003; per-app logins guard each
+   service. Management/admin actions go through the gated Portainer console.)*
 2. **See service health** — the dashboard lists running services and each one's health status.
 3. **Bring a service up / down** — operator deploys/starts (and stops) a service through the
    hub; state reflects in the dashboard.
@@ -111,7 +115,7 @@ Ordered by value/uncertainty for sequencing:
 
 | Question | Owner | Status |
 | -------- | ----- | ------ |
-| What does the hub *build on* — an existing dashboard (e.g. Homepage/Dockge-style) or a custom app? | wes-cutting | open — decide at the foundation slice (may warrant `ADR-0003`) |
-| What is the health-check contract each service exposes to the hub? | wes-cutting | open — defined in the foundation slice |
-| Auth mechanism for the single-user barrier (local creds vs. a proven auth proxy)? | wes-cutting | open — foundation slice (may warrant an ADR) |
+| What does the hub *build on* — an existing dashboard or a custom app? | wes-cutting | **Resolved** → adopt Homepage + Portainer ([ADR-0003](adr/ADR-0003-hub-platform.md), SPIKE-05) |
+| What is the health-check contract each service exposes to the hub? | wes-cutting | open — defined in the foundation slice (Homepage label/ping conventions) |
+| Auth mechanism for the hub | wes-cutting | **Resolved (for now)** → open launcher on trusted LAN + per-app auth; forward-auth gate deferred (ADR-0003 growth path) |
 | Persistence medium + backup (see `ADR-0002`) | wes-cutting | open → `ADR-0002` spikes |

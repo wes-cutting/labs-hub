@@ -1,0 +1,6 @@
+---
+# Docker provider for auto-discovery. Containers with `homepage.*` labels appear
+# as tiles automatically (see the labels on jellyfin/homebox). Socket is mounted
+# read-only in compose.yml.
+my-docker:
+  socket: /var/run/docker.sock
