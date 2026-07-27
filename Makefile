@@ -1,6 +1,7 @@
-# labs-hub — foundation gate & ops (LH-S1).
+# labs-hub — hub + services gate & ops.
 # The gate mirrors CI (.github/workflows/gate.yml): same checks, same order.
-COMPOSE := docker compose -f deploy/compose.yml
+# Compose spans the hub (compose.yml) + each service file (compose.*.yml).
+COMPOSE := docker compose -f deploy/compose.yml -f deploy/compose.media.yml
 HOST    ?= localhost
 
 .PHONY: help gate lint validate shellcheck smoke up down deploy

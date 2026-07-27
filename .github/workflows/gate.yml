@@ -31,7 +31,7 @@ jobs:
         run: pipx run yamllint deploy/
 
       - name: validate (docker compose config)
-        run: docker compose -f deploy/compose.yml config -q
+        run: docker compose -f deploy/compose.yml -f deploy/compose.media.yml config -q
 
       - name: shellcheck
         run: |
