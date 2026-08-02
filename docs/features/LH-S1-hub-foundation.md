@@ -105,7 +105,7 @@ Right-sized, infra-appropriate (no app unit tests yet):
 | Question | Owner | Status |
 | -------- | ----- | ------ |
 | Pi ↔ GitHub access for git deploy: public repo vs. read-only deploy key? | wes-cutting | **Resolved** → public repo (repo verified secret-clean first) |
-| Hardcode `HOMEPAGE_ALLOWED_HOSTS` to the Pi IP, or DHCP-reserve/hostname the Pi? | wes-cutting | open — IP works now; revisit if the lease changes |
+| Hardcode the Pi IP, or DHCP-reserve/hostname the Pi? | wes-cutting | **Resolved** → single `LABS_HUB_HOST` var (default `raspberrypi.local`, mDNS) flows into allowed-hosts + tile links; no IP hardcoded |
 
 ## 12. UX (folded in)
 

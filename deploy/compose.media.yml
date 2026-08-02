@@ -22,5 +22,5 @@ services:
       - "homepage.group=Media"
       - "homepage.name=Jellyfin"
       - "homepage.icon=jellyfin.png"
-      - "homepage.href=http://192.168.1.185:8096"
+      - "homepage.href=http://${LABS_HUB_HOST:-raspberrypi.local}:8096"
       - "homepage.description=Media server"

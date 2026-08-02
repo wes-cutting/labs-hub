@@ -67,7 +67,9 @@ horizontal; front-load risk; usable every step; decided ≠ validated; secure fr
 
 ## Operating notes
 
-- **Target host:** Raspberry Pi 5 on the LAN (currently `192.168.1.185`, Wi-Fi), reached over
-  key-based SSH. mDNS `raspberrypi.local` did not resolve — use the IP.
+- **Target host:** Raspberry Pi 5 on the LAN, reached over key-based SSH at **`raspberrypi.local`**
+  (mDNS/Avahi — follows the Pi across networks and DHCP IP changes; no need to chase IPs). The
+  reachable name is configurable in one place via **`LABS_HUB_HOST`** in `deploy/.env`. For
+  roaming/off-LAN access (Vanlife), Tailscale gives a stable name over a private overlay.
 - **Growing the kit is a co-deliverable:** friction found while building is logged in
   [`docs/KIT_FEEDBACK.md`](docs/KIT_FEEDBACK.md) for a later kit pass.

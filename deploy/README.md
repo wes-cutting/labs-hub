@@ -18,7 +18,7 @@ cd ~/labs-hub
 
 # 2. Local config (not committed):
 cp deploy/.env.example deploy/.env
-$EDITOR deploy/.env          # set HOMEPAGE_ALLOWED_HOSTS to how you reach the Pi
+$EDITOR deploy/.env          # set LABS_HUB_HOST to how you reach the hub (default raspberrypi.local)
 
 # 3. Data-root (ADR-0002):
 sudo mkdir -p /srv/labs-hub/portainer/data \
