@@ -10,8 +10,9 @@ understand.
 
 ## Status
 
-**Phase:** foundation built. Discovery, feasibility, and the hub-platform choice are done, and
-the **hub foundation (LH-S1) is running on the Pi** from a tracked, gate-green Compose definition.
+**Phase:** hosting real services. Discovery, feasibility, and the hub-platform choice are done; the
+**hub (LH-S1), Jellyfin (LH-S2) and the first custom app (LH-S3-demo) are running on the Pi** from a
+tracked, gate-green Compose definition.
 
 - **Feasibility:** ✅ validated — [SPIKE-01](docs/spikes/SPIKE-01-pi5-hub-plus-jellyfin-feasibility.md)
   (Pi 5 runs a Docker/Compose hub + Jellyfin transcoding at ~2.8× realtime; **CPU, not RAM, is
@@ -19,9 +20,10 @@ the **hub foundation (LH-S1) is running on the Pi** from a tracked, gate-green C
 - **Hub platform:** ✅ decided — adopt **Homepage + Portainer** ([ADR-0003](docs/adr/ADR-0003-hub-platform.md), [SPIKE-05](docs/spikes/SPIKE-05-hub-platform-evaluation.md)).
 - **Foundation (LH-S1):** ✅ built — `deploy/` Compose foundation, `make gate` green + CI wired, running on the Pi, auto-discovering services ([FEAT-LH-S1](docs/features/LH-S1-hub-foundation.md)).
 - **Jellyfin (LH-S2):** ✅ built — managed service in `deploy/compose.media.yml`, data on the data-root, discovered on the hub, within the transcode budget ([FEAT-LH-S2](docs/features/LH-S2-jellyfin.md)).
+- **Budgeteer demo (LH-S3-demo):** ✅ built — the **first custom app** on the hub, in `deploy/compose.budgeteer-demo.yml`: image pulled from GHCR (arm64, digest-pinned) + Postgres on the data-root, discovered on the hub, `/api/health` in smoke. **Synthetic data only** ([FEAT-LH-S3-DEMO](docs/features/LH-S3-budgeteer-demo.md)).
 - **Resume from:** the newest status report —
-  [`docs/status-reports/2026-07-26-lh-s2.md`](docs/status-reports/2026-07-26-lh-s2.md).
-- **Next:** **LH-S3** — the custom-service deployment pattern — see [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md).
+  [`docs/status-reports/2026-08-02-lh-s3-demo.md`](docs/status-reports/2026-08-02-lh-s3-demo.md).
+- **Next:** **SPIKE-02/03** (SSD medium + at-rest encryption/backup) — they now gate **LH-S3 proper**, the real budgeteer ledger — see [`docs/03_ROADMAP.md`](docs/03_ROADMAP.md).
 
 ## What it is (and isn't)
 
@@ -43,6 +45,7 @@ Chosen per project via ADRs (see [`docs/adr/`](docs/adr/)):
 | Service data / state | Single data-root, bind mounts, likely external SSD | [`ADR-0002`](docs/adr/ADR-0002-service-data-and-state.md) — **Proposed** (medium/backup/encryption not yet spiked) |
 | Gate | `make gate` (yamllint + `docker compose config` + shellcheck) + smoke; CI in `.github/workflows/gate.yml` | wired (LH-S1) |
 | Hub | Homepage (launcher/catalog/health) + Portainer (lifecycle/metrics), in `deploy/` | [ADR-0003](docs/adr/ADR-0003-hub-platform.md) — **Validated** |
+| Custom services | Built in the app's own CI → GHCR (ARM64), **pulled** by the Pi and pinned by digest; state in a Postgres container on the data-root | exercised by LH-S3-demo; `ADR-0004` deliberately not yet written (*decided ≠ validated*) |
 
 ## How we work
 

@@ -30,5 +30,8 @@ check "Homepage" "http://$HOST:3000/api/healthcheck" "200"
 # Portainer's / redirects (307) depending on state; /api/status is the stable health endpoint.
 check "Portainer" "http://$HOST:9000/api/status" "200"
 check "Jellyfin" "http://$HOST:8096/health" "200"
+# budgeteer's /api/health is READINESS: 200 only when the app is up AND its database answers
+# (DEPLOY_CONTRACT §6), so this probe also covers the demo Postgres.
+check "Budgeteer" "http://$HOST:${BUDGETEER_DEMO_PORT:-3010}/api/health" "200"
 
 exit "$fail"

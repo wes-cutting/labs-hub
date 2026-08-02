@@ -30,8 +30,17 @@ jobs:
       - name: lint (yamllint)
         run: pipx run yamllint deploy/
 
+      # Placeholder secrets: the budgeteer demo stack guards its secrets with `${VAR:?...}`
+      # so a real deploy fails loudly by name. CI has no deploy/.env, so supply throwaway
+      # values for the structural check — `make up` still has no fallback. Mirrors `make validate`.
       - name: validate (docker compose config)
-        run: docker compose -f deploy/compose.yml -f deploy/compose.media.yml config -q
+        env:
+          BUDGETEER_DEMO_POSTGRES_PASSWORD: gate-placeholder
+          BUDGETEER_DEMO_SESSION_SECRET: gate-placeholder
+        run: |
+          docker compose -f deploy/compose.yml \
+                         -f deploy/compose.media.yml \
+                         -f deploy/compose.budgeteer-demo.yml config -q
 
       - name: shellcheck
         run: |

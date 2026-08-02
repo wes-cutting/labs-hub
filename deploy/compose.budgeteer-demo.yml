@@ -1,0 +1,96 @@
+# labs-hub — budgeteer DEMO instance (LH-S3-demo).
+# See docs/features/LH-S3-budgeteer-demo.md. Composed alongside the hub:
+# `docker compose -f deploy/compose.yml -f deploy/compose.budgeteer-demo.yml` (the Makefile
+# does this). Project name + env come from compose.yml. Persistence per ADR-0002 (data-root).
+#
+# THE DATA HERE IS SYNTHETIC AND ONLY SYNTHETIC. It is loaded by budgeteer's `seed:demo`,
+# which invents every payee, amount and account name. This is the showcase box from
+# budgeteer's DEPLOY_CONTRACT §10, adapted to hub conventions — NOT the household's real
+# ledger. Deploying the real instance is LH-S3 proper, and it needs its own decisions
+# (TLS/cookie posture, backup, at-rest encryption via SPIKE-03).
+#
+# ISOLATION (why this is a separate stack, not a mode): the demo box keeps its own database,
+# its own network, its own session-signing secret, and a published credential. Those are the
+# guarantees BUD-S93 made structural; they are preserved here rather than re-argued.
+
+services:
+  budgeteer-demo-db:
+    image: postgres:16
+    container_name: budgeteer-demo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: budgeteer
+      POSTGRES_USER: budgeteer
+      POSTGRES_PASSWORD: ${BUDGETEER_DEMO_POSTGRES_PASSWORD:?set it in deploy/.env — see deploy/README.md}
+    volumes:
+      # Bind mount under the data-root (ADR-0002 prefers this over a named volume) so the
+      # hub's whole state stays one greppable subtree. Needs `chown 999:999` — the postgres
+      # image's initdb runs as uid 999 and fails on a root-owned directory.
+      - ${LABS_HUB_DATA_ROOT:-/srv/labs-hub}/budgeteer-demo/db:/var/lib/postgresql/data
+    networks:
+      - budgeteer-demo
+    ports:
+      # THE ONE DELIBERATE DEVIATION from "the database port is never published"
+      # (DEPLOY_CONTRACT §2), and it is why the demo box can be seeded at all: `seedDemo` is
+      # deliberately absent from the production image, so the seed runs from a budgeteer repo
+      # checkout over this port. Bound to 127.0.0.1 — reachable from the Pi itself (and an SSH
+      # tunnel) and from nothing else on the LAN. The database behind it holds invented data.
+      - "127.0.0.1:${BUDGETEER_DEMO_DB_PORT:-5434}:5432"
+    healthcheck:
+      # The app must wait for Postgres to answer QUERIES, not merely to exist, or it races
+      # the database's own start-up (DEPLOY_CONTRACT §4).
+      test: ["CMD-SHELL", "pg_isready -U budgeteer -d budgeteer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  budgeteer-demo:
+    # budgeteer v0.2.0, pinned by DIGEST rather than tag: a tag can be repointed, a digest
+    # cannot (DEPLOY_CONTRACT §1). That is not hypothetical here — `0.1.0` was published
+    # twice and now resolves to a different digest than the one its own contract recorded.
+    # Built by budgeteer CI for linux/arm64 and pulled here — never built on the Pi
+    # (ADR-0008 §4). Override with BUDGETEER_IMAGE to try another build.
+    image: "${BUDGETEER_IMAGE:-ghcr.io/wes-cutting/budgeteer@sha256:\
+      0535855c75e2bd71500923c3f623cc639f1eefea08d4d31cb785ebdeac93283f}"
+    container_name: budgeteer-demo
+    restart: unless-stopped
+    depends_on:
+      budgeteer-demo-db:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      # Hard-wired to this stack's own db service — deliberately NOT read from an ambient
+      # ${DATABASE_URL}, so an operator with real values exported cannot aim the demo
+      # container at a real database. The only substitution is the demo password.
+      DATABASE_URL: "postgres://budgeteer:${BUDGETEER_DEMO_POSTGRES_PASSWORD:?set in deploy/.env}\
+        @budgeteer-demo-db:5432/budgeteer"
+      # A distinct variable name, so the demo box cannot inherit a real signing key.
+      SESSION_SECRET: ${BUDGETEER_DEMO_SESSION_SECRET:?set it in deploy/.env — see deploy/README.md}
+      CORS_ORIGINS: ""
+      LOG_LEVEL: info
+      # false here, opposite to a real deployment (DEPLOY_CONTRACT §5) — and on purpose. The
+      # hub serves plain http:// on the LAN, and a browser DISCARDS a Secure cookie that
+      # arrives over HTTP: the viewer would sign in and bounce straight back to the login
+      # page. What that normally trades away is a session token on a box of invented figures.
+      # Set true once the hub terminates TLS.
+      SESSION_COOKIE_SECURE: ${BUDGETEER_DEMO_COOKIE_SECURE:-false}
+    networks:
+      - budgeteer-demo
+    ports:
+      # 3010: clear of budgeteer's dev (3001/5173) and harness (3099) lanes, and of every
+      # hub service (3000 Homepage, 9000 Portainer, 8096 Jellyfin, 7745 Homebox).
+      - "${BUDGETEER_DEMO_PORT:-3010}:3001"
+    labels:
+      # Homepage discovers this from the read-only socket — no edit to homepage/config needed.
+      - "homepage.group=Apps"
+      - "homepage.name=Budgeteer (demo)"
+      - "homepage.icon=mdi-wallet-outline"
+      - "homepage.href=http://${LABS_HUB_HOST:-raspberrypi.local}:${BUDGETEER_DEMO_PORT:-3010}"
+      - "homepage.description=Envelope budgeting — synthetic demo data"
+
+networks:
+  # Its own network, not the hub default: nothing else on the hub needs to reach the demo
+  # database, and the real budgeteer (LH-S3) must never be able to.
+  budgeteer-demo:
+    driver: bridge

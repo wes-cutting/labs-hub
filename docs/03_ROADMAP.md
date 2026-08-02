@@ -15,13 +15,17 @@ roadmap-item: —
 | History       | [`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md) — re-sequencing log + done/shipped ledger |
 | Sources       | [`01_INTAKE.md`](01_INTAKE.md) · [`02_PRD.md`](02_PRD.md) · [`ADR-0001`](adr/ADR-0001-os-and-container-runtime.md) · [`ADR-0002`](adr/ADR-0002-service-data-and-state.md) |
 
-**Current focus:** **LH-S3 is BLOCKED** — the chosen first custom app (budgeteer) has no
-authentication and holds real financial data, so it cannot be exposed on the LAN until it has
-its own auth. That auth work lives in the **budgeteer repo** (its roadmap #19), not here. So
-the recommended next labs-hub work is **SPIKE-02/03** (SSD + at-rest encryption/backup) —
-now more urgent because budgeteer's sensitive data will land on the Pi. (LH-S1 hub + LH-S2
-Jellyfin are done and deployed: tracked `deploy/`, gate-green with CI, data on the data-root,
-auto-discovered — [FEAT-LH-S1](features/LH-S1-hub-foundation.md) · [FEAT-LH-S2](features/LH-S2-jellyfin.md).)
+**Current focus:** **LH-S3 is unblocked and now split.** budgeteer shipped its auth epic (its
+`ADR-0009`), retiring the blocker, and added a **demo instance** (synthetic data, own database and
+secrets). So **LH-S3-demo is Done** — the first custom app is on the hub, proving the whole pattern
+(CI→GHCR→pull, Postgres container, data-root, labels, `/api/health` in smoke) against a box where a
+mistake costs nothing. **LH-S3 proper — the real ledger — is `Planned`, not done**, and needs
+decisions the demo did not answer: TLS at the hub vs. `SESSION_COOKIE_SECURE`, backup, and at-rest
+encryption. The recommended next work is therefore **SPIKE-02/03** (SSD + at-rest
+encryption/backup), which now gates a real financial ledger rather than merely preceding it.
+(LH-S1 hub, LH-S2 Jellyfin and LH-S3-demo are deployed: tracked `deploy/`, gate-green with CI, data
+on the data-root, auto-discovered — [FEAT-LH-S1](features/LH-S1-hub-foundation.md) ·
+[FEAT-LH-S2](features/LH-S2-jellyfin.md) · [FEAT-LH-S3-DEMO](features/LH-S3-budgeteer-demo.md).)
 
 ---
 
@@ -67,7 +71,8 @@ retired, whose gate (if any) has landed.
 | Id | Item | Kind | Value | Risk | Gated by | Status | Links (spec · UX) |
 | -- | ---- | ---- | ----- | ---- | -------- | ------ | ----------------- |
 | LH-S2 | **Jellyfin** as a managed service (`compose.media.yml`, data-root, labels), within the single-stream transcode budget | slice | High | Med | LH-S1 | **Done** | [FEAT-LH-S2](features/LH-S2-jellyfin.md) |
-| LH-S3 | **Deploy budgeteer** (first custom app) — CI→GHCR ARM64 image + **Postgres container** + web, on data-root/labels/`/health`. **Gated on budgeteer having its own auth** (write-open financial data). | slice | High | High | **budgeteer auth epic (budgeteer roadmap #19)** · LH-S1 | **Blocked** | see LH-S3 note below |
+| LH-S3-demo | **budgeteer demo instance** (first custom app on the hub) — `v0.2.0` pulled from GHCR (arm64, digest-pinned) + Postgres 16 on the data-root, own network/secrets, labels, `/api/health` in smoke. **Synthetic data only.** | slice | Med | Low | LH-S1 · budgeteer BUD-S93 | **Done** (deployed) | [FEAT-LH-S3-DEMO](features/LH-S3-budgeteer-demo.md) |
+| LH-S3 | **Deploy budgeteer for real** (the household ledger) — same image and pattern as the demo, but carrying real financial data. Auth blocker **retired** (budgeteer `ADR-0009`); now gated on the **data-at-rest and TLS decisions** instead. | slice | High | Med | SPIKE-03 (at-rest encryption/backup) · TLS-vs-cookie decision (`DEPLOY_CONTRACT` §5) · LH-S3-demo | **Planned** | see LH-S3 note below |
 
 > **LH-S2 note — direct-play vs. transcode (address when the Jellyfin slice starts):**
 > Direct-play (no live transcode → avoids the SPIKE-01 CPU ceiling) is decided by **all** of:
@@ -82,19 +87,27 @@ retired, whose gate (if any) has landed.
 > constraint really is. "Pre-optimized library" = storing media in the client-friendly combo
 > so the Pi never transcodes live.
 
-> **LH-S3 note — budgeteer (first custom app), and the auth-before-exposure rule:**
-> Analysis of the sibling `budgeteer` project (TS monorepo: Fastify API `:3001` with `/health`,
-> React+Vite web, PGlite/Postgres, migrations at startup) found it has **no authentication**
-> and holds **real financial data** — its own `.env.example` names serving it on the network as
-> the trigger to build auth. **Decision:** budgeteer gets its **own auth first** (its roadmap
-> #19), in the budgeteer repo, *before* LH-S3 deploys it. **Decided deploy shape (for when
-> unblocked):** build the image in **CI → GHCR (ARM64)**, Pi **pulls** it (the reusable
-> custom-service pattern → formal `ADR-0004` written at build time, validated); a **Postgres
-> container** for state; API + web static; data on the data-root; Homepage labels; `/health`
-> in smoke. **General rule this establishes:** *a custom service that handles sensitive data
-> must have default-deny auth before it is exposed on the LAN* (candidate for `SECURITY.md`).
-> This also raises the priority of **SPIKE-03** (at-rest encryption + backup/restore) — a
-> stealable van node will now hold financial data.
+> **LH-S3 note — budgeteer, the auth-before-exposure rule, and why the slice split:**
+> The original block was that `budgeteer` had **no authentication** while holding **real financial
+> data**. That is **retired**: budgeteer shipped users/sessions with a default-deny gate, roles,
+> login throttling and session-expiry guards (BUD-S87..S89; its `ADR-0009` is `Accepted`).
+> **The deploy shape held up exactly as decided** — image built in **CI → GHCR (ARM64)**, Pi
+> **pulls** it, a **Postgres container** for state, one process serving API + SPA, data on the
+> data-root, Homepage labels, health in smoke — and `LH-S3-demo` has now exercised all of it.
+> **Why the split:** budgeteer's own `DEPLOY_CONTRACT` §10 demo instance made it possible to prove
+> the pattern with **synthetic data**, so the risky decisions are not bundled with the plumbing.
+> **What the demo did NOT answer, and LH-S3 proper still must:**
+> (a) **TLS vs. `SESSION_COOKIE_SECURE`** (`DEPLOY_CONTRACT` §5) — the demo sets it `false` because
+> the hub serves plain HTTP and browsers discard `Secure` cookies over HTTP; a real ledger must not
+> inherit that, so the hub needs TLS termination or an explicit, accepted exposure.
+> (b) **At-rest encryption + backup** — **SPIKE-03**, jointly owned with budgeteer
+> (`DEPLOY_CONTRACT` §8). budgeteer confines all state to one Postgres volume, which is what makes
+> encrypting it tractable; nothing encrypts it today.
+> (c) **`ADR-0004`** formalizing the custom-service pattern — deliberately still unwritten:
+> *decided ≠ validated*, and one synthetic box is not yet validation on a service that matters.
+> **General rule this established, and which still stands:** *a custom service that handles
+> sensitive data must have default-deny auth before it is exposed on the LAN* (candidate for
+> `SECURITY.md`).
 
 ### Hardening
 
