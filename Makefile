@@ -1,7 +1,7 @@
 # labs-hub — hub + services gate & ops.
 # The gate mirrors CI (.github/workflows/gate.yml): same checks, same order.
 # Compose spans the hub (compose.yml) + each service file (compose.*.yml).
-COMPOSE := docker compose -f deploy/compose.yml -f deploy/compose.media.yml
+COMPOSE := docker compose -f deploy/compose.yml -f deploy/compose.media.yml -f deploy/compose.budgeteer-demo.yml
 HOST    ?= localhost
 
 .PHONY: help gate lint validate shellcheck smoke up down deploy
@@ -19,7 +19,14 @@ gate: lint validate shellcheck
 lint:
 	yamllint deploy/
 
+# Placeholder secrets for the STRUCTURAL check only. The budgeteer demo stack declares its
+# secrets with `${VAR:?...}` so a real `make up` fails loudly by name when they are missing —
+# but that same guard would make `config -q` unrunnable on any machine without deploy/.env
+# (CI, a fresh clone). Supplying throwaway values here validates the shape without weakening
+# the runtime guard: `up` does not set them.
 validate:
+	BUDGETEER_DEMO_POSTGRES_PASSWORD=gate-placeholder \
+	BUDGETEER_DEMO_SESSION_SECRET=gate-placeholder \
 	$(COMPOSE) config -q
 
 shellcheck:
