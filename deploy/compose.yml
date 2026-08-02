@@ -15,8 +15,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Homepage refuses requests whose Host isn't allow-listed. Set in deploy/.env.
-      HOMEPAGE_ALLOWED_HOSTS: ${HOMEPAGE_ALLOWED_HOSTS:-192.168.1.185:3000}
+      # Homepage refuses requests whose Host isn't allow-listed. Derived from LABS_HUB_HOST
+      # (deploy/.env) so the reachable name lives in one place. Default: the Pi's mDNS name.
+      HOMEPAGE_ALLOWED_HOSTS: ${LABS_HUB_HOST:-raspberrypi.local}:3000
     volumes:
       - ./homepage/config:/app/config
       # Read-only socket: discovery only (least privilege).
