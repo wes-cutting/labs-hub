@@ -1,3 +1,8 @@
+---
+id:     DOC-NFR  # REQUIRED · stable + typed, see 00_WAYS_OF_WORKING.md §4
+type:   nfr
+status: Draft  # Draft → Proposed → Validated → Accepted
+---
 <!--
 NFR / OPERATIONAL-READINESS TEMPLATE — copy to docs/07_NFR.md. The non-functional
 requirements and the operational readiness a project must meet before it's treated as
@@ -22,6 +27,13 @@ optimizing. Keep it in sync with the budgets/alerts actually configured.
 
 Concrete, testable targets for the critical journeys. Each maps to a perf test run at a
 realistic volume.
+
+**The statistic you assert must be the statistic you name here.** A budget written as `p95`
+and enforced by a helper that actually reports the *maximum* is not a stricter budget — it is
+an intermittent-failure generator, and it will be triaged as flakiness rather than as the
+measurement bug it is. Use a **nearest-rank percentile** (index `ceil(p × n) − 1`; p95 of 20
+samples is the 19th, not the 20th) and **discard a warm-up phase** before measuring. See
+[`TESTING_STRATEGY.md`](../docs/TESTING_STRATEGY.md) §4.
 
 | Journey / operation | Budget | At volume | How verified |
 | ------------------- | ------ | --------- | ------------ |

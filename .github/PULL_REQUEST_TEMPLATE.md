@@ -1,7 +1,14 @@
 <!--
 PULL REQUEST TEMPLATE — carry as-is. This checklist mirrors the Definition of Done in
 docs/ENGINEERING_STANDARDS.md §2 and the per-slice DoD in docs/00_WAYS_OF_WORKING.md §5.
-A box you can't check is a blocker, not a footnote — say why under "Carries / follow-ups".
+Fill this in as the work finishes, not at review time (docs/00_WAYS_OF_WORKING.md §9) —
+that is when an un-tickable box is still cheap to fix.
+
+An unchecked box is one of two things, and they are not the same:
+  • APPLIES but isn't done → a blocker. Say why under "Carries / follow-ups".
+  • DOESN'T APPLY to this change → mark it "n/a — <reason>" (e.g. "n/a — docs only").
+Never tick a box to make the list look complete. A falsely-green checklist is worse than a
+visibly incomplete one: it spends the reviewer's trust on a claim nobody checked.
 -->
 
 ## What & why

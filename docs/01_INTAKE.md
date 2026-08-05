@@ -1,5 +1,5 @@
 ---
-id: INTAKE
+id: DOC-INTAKE
 type: intake
 status: Proposed
 roadmap-item: —

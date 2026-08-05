@@ -31,6 +31,12 @@ Discovery names the first spike.
 - **Usable at every step.** Ask "is it usable yet?" each increment.
 - **Challenge the plan.** Before a phase, name the riskiest assumptions and sequencing
   risks; propose a spike if warranted. Don't execute a flawed plan flawlessly.
+- **One slice per session — then stop.** Build **exactly one** roadmap item, write its status
+  report, and **stop for review**, even if the next item is obvious, unblocked, and there is
+  context to spare. A kickoff prompt that lists several items is describing the *order*, not
+  granting permission to do them all. Ask before continuing past the slice boundary — the
+  human needs to see each slice while redirecting it is still cheap
+  ([`00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) §9).
 - **Right-size the ceremony.** Match process weight to the work's risk and reach
   ([`00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) §11): compress for small/low-risk
   slices, scale back up for money/auth/multi-tenant data, integrations, or anything
@@ -90,6 +96,14 @@ example-code default, doc/process friction), log it in
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`).
 - Trunk-based with short-lived branches; **commit/push only when asked**. If on the
   default branch, branch first.
+- **End every completed unit of work with the two artifacts that merge it.** Alongside the
+  status report, produce (1) a **single-line Conventional Commit message** and (2) a **PR
+  description filled into [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md)**
+  — ready to paste, right-sized to the change. A box that genuinely doesn't apply is marked
+  **n/a with the reason**, never silently ticked; anything deferred goes under *Carries /
+  follow-ups*. Writing these per result is what keeps the DoD checklist honest, instead of
+  reconstructing it at review time. See
+  [`docs/00_WAYS_OF_WORKING.md`](docs/00_WAYS_OF_WORKING.md) §9.
 
 ## Stack
 

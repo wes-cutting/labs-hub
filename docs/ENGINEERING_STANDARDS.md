@@ -1,3 +1,8 @@
+---
+id:     DOC-ENGINEERING-STANDARDS
+type:   standard
+status: Accepted
+---
 # Engineering Standards
 
 | Field   | Value                                                  |
@@ -41,12 +46,25 @@ is checked on every change:
 - [ ] External input validated at the boundary.
 - [ ] UX states handled: empty, loading, error, success (and permission-limited if
       relevant).
-- [ ] Accessibility check on changed UI (baseline **WCAG 2.2 AA**; respect
-      `prefers-reduced-motion`).
+- [ ] **Every new route/surface in this slice is named by an accessibility scan — list them
+      here** (baseline **WCAG 2.2 AA**; respect `prefers-reduced-motion`). Phrased as a
+      pointer on purpose: *"the changed UI meets AA"* is satisfied by a green suite and is
+      therefore unfalsifiable, while *"these scans cover these surfaces"* is not. A scan suite
+      covers only the pages someone added to it ([`TESTING_STRATEGY.md`](TESTING_STRATEGY.md) §5).
+- [ ] **Cold start — from a completely empty datastore, can a new user reach a working app
+      using only the documented steps and no out-of-band provisioning?** Mandatory for any
+      slice that adds an access gate, a tenancy boundary, or a required credential. The bar is
+      *"a person can get in"*, not *"the endpoint exists"*. Introducing a gate is a two-sided
+      change and the second side — how the **first** principal comes to exist — has no natural
+      home in a vertical slice: it looks like setup rather than a feature, so it gets skipped
+      while every gate stays green.
 - [ ] Authorization checked at the resource level (default-deny) where applicable.
 - [ ] No secrets committed or logged.
 - [ ] Relevant docs updated **in the same change** — including overview/summary lines and
-      internal links (which rot first); doc status promoted as warranted.
+      internal links (which rot first); doc status promoted as warranted. A doc claim about a
+      user-facing path must **name the surface, not the endpoint**: *"`POST /auth/setup`
+      exists"* and *"a user can sign up"* are different assertions, and that is exactly where
+      a README quietly starts describing a product that doesn't exist.
 
 ## 3. Commits & workflow
 

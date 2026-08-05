@@ -1,3 +1,8 @@
+---
+id:     DOC-KIT-FEEDBACK
+type:   feedback-log
+status: Living
+---
 <!--
 KIT FEEDBACK — a running log of improvements to the *baseline starter kit* discovered while
 building THIS project. Feedback FROM the project TO the kit (distinct from ORIGIN.md, which

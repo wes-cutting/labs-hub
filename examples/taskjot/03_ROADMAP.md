@@ -26,7 +26,7 @@ slice that passes the gate.
 Foundation → risk-retirement spike (done) → domain slices (capture, complete, list) →
 hardening (export/backup, a11y pass).
 
-## 4. The plan
+## 3. The plan
 
 ### Foundation
 
@@ -54,13 +54,13 @@ hardening (export/backup, a11y pass).
 | - | ---- | ---- | ----- | ---- | ------- | ------ | ----- |
 | 5 | Export / backup + a11y pass | hardening | Med | Med | real daily use exists | Planned | NFR doc (`07_NFR.md`) |
 
-## 5. Re-sequencing log
+## 4. Re-sequencing log
 
 | Date | Change | Trigger | Effect on the plan |
 | ---- | ------ | ------- | ------------------ |
 | 2026-06-10 | Pulled *complete a task* ahead of list/filter; deferred the global hotkey to "later" | [SPIKE-01](spikes/01-quick-capture-value.md) surprise (one-key complete mattered as much as capture; hotkey barely used) | Slice 3 became "complete"; filtering slid to slice 4; hotkey dropped from v1 |
 
-## 6. Done / shipped
+## 5. Done / shipped
 
 | # | Item | Shipped | Notes |
 | - | ---- | ------- | ----- |

@@ -1,6 +1,13 @@
+---
+id:     DOC-PRD  # REQUIRED · stable + typed, see 00_WAYS_OF_WORKING.md §4
+type:   prd
+status: Proposed  # Draft → Proposed → Validated → Accepted
+---
 <!--
-PRD TEMPLATE — copy to docs/02_PRD.md. Write it AFTER the first value-hypothesis /
-data-profiling spikes (see docs/00_WAYS_OF_WORKING.md). Status starts at Proposed.
+PRD TEMPLATE — copy to docs/02_PRD.md. Write it AFTER the first reality-profiling spike —
+data-profiling, hardware/load-profiling, integration-behavior, or value-hypothesis,
+whichever matches this project's reality (see docs/00_WAYS_OF_WORKING.md §6). Status starts
+at Proposed.
 -->
 
 # Product Requirements — <Project>

@@ -1,3 +1,8 @@
+---
+id:     DOC-DOCS-MAP
+type:   index
+status: Living
+---
 # Documentation map
 
 This is the authoritative map of the kit's docs: the **numbering scheme**, what each doc
@@ -44,6 +49,7 @@ file when its stage arrives.
 | [`ENGINEERING_STANDARDS.md`](ENGINEERING_STANDARDS.md) | Conventions, the Definition of Done, and opt-in recommended patterns. |
 | [`TESTING_STRATEGY.md`](TESTING_STRATEGY.md) | Test layers and the gate. |
 | [`SECURITY.md`](SECURITY.md) | Secrets, data handling, authn/authz, dependency scanning. |
+| [`DEPLOYMENT.md`](DEPLOYMENT.md) | The deployment constraints that are nearly free at commit zero and breaking changes afterwards — API base path, deny-by-default build context, identity across restores, the demo-instance pattern. Read **before** the first deploy, not at it. The project's concrete deployment goes in `DEPLOY_CONTRACT.md` (situational template, below). |
 | [`KIT_FEEDBACK.md`](KIT_FEEDBACK.md) | A running log of improvements to **this baseline kit** found while building the project, for a later kit pass. Carry the stub; append as lessons surface ([`00_WAYS_OF_WORKING.md`](00_WAYS_OF_WORKING.md) §9). |
 
 ## Per-project folders
@@ -73,7 +79,9 @@ Copied only when a specific kind of work comes up, not per numbered doc:
 
 | Template | When |
 | -------- | ---- |
+| [`README-TEMPLATE.md`](../templates/README-TEMPLATE.md) | The first docs round → the repo's own `README.md`. See "The repo front page" below — this one has a **rename** step attached to it. |
 | [`SCHEMA-MAP-TEMPLATE.md`](../templates/SCHEMA-MAP-TEMPLATE.md) | A bulk import/ETL will be prepared by an agent or person without repo access (see [`SECURITY.md`](SECURITY.md)'s ETL-artifact split). |
+| [`DEPLOY-CONTRACT-TEMPLATE.md`](../templates/DEPLOY-CONTRACT-TEMPLATE.md) | The project is about to be deployed somewhere real → `docs/DEPLOY_CONTRACT.md`. Read [`DEPLOYMENT.md`](DEPLOYMENT.md) first — two of its rules are breaking changes once anything has shipped. |
 
 ## Target `docs/` tree (once a project is underway)
 
@@ -90,6 +98,8 @@ docs/
 ├─ 06_API_CONTRACT.md        # interface contract      (fill-in)
 ├─ 07_NFR.md                 # non-functional / ops    (fill-in · hardening)
 ├─ ARCHITECTURE.md  ENGINEERING_STANDARDS.md  TESTING_STRATEGY.md  SECURITY.md   (carry as-is)
+├─ DEPLOYMENT.md             # deployment constraints  (carry as-is · read before first deploy)
+├─ DEPLOY_CONTRACT.md        # this project's deployment   (fill-in · when it ships)
 ├─ KIT_FEEDBACK.md           # baseline-kit improvements   (carry stub · append)
 ├─ adr/                      # ADR-0000 meta + ADR-0001… one per decision
 ├─ features/                 # one feature spec per feature
@@ -105,6 +115,25 @@ Pair with the agent to run **discovery**, guided by
 [`../templates/DISCOVERY-GUIDE.md`](../templates/DISCOVERY-GUIDE.md) (a read-only playbook);
 capture it in [`01_INTAKE.md`](01_INTAKE.md). The intake names the first **spike**; the
 spike de-risks the bet; *then* the PRD and the rest of the narrative get written.
+
+## The repo front page
+
+A fresh copy of the kit arrives with a root `README.md` describing **the kit**. That is
+correct for the kit's own repo and wrong for yours the moment a project starts — leave it
+and the repo's front page advertises the starter kit indefinitely, while the kit's overview
+and the project's overview fight over one file.
+
+**In the first docs round, hand the front page over to the project:**
+
+1. `git mv README.md KIT-README.md` — the kit's overview keeps its content and its links,
+   just not the front page.
+2. Copy [`../templates/README-TEMPLATE.md`](../templates/README-TEMPLATE.md) to `README.md`
+   and fill it in: name, one-liner, status, the stack per `ADR-0001`, links into `docs/`,
+   and a pointer to the newest status report.
+
+From then on the project README is **living** — update its Status section in the same change
+as each status report, the same way any other doc moves with the code
+([`00_WAYS_OF_WORKING.md` §9](00_WAYS_OF_WORKING.md)).
 
 > Keep docs and code in sync **in the same change**. A change to data shape, interface, or
 > architecture updates the corresponding doc in the same commit.

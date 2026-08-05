@@ -1,3 +1,9 @@
+---
+id:           SPIKE-<NN>  # REQUIRED · stable + typed, see 00_WAYS_OF_WORKING.md §4
+type:         spike
+status:       Open  # Open → Done
+roadmap-item: <SPIKE-NN>  # the roadmap id this answers
+---
 <!--
 SPIKE REPORT TEMPLATE
 A spike is a time-boxed, throwaway investigation that answers ONE question against
@@ -11,7 +17,7 @@ The spike's CODE is disposable; this report is the deliverable. Keep it short.
 | Field      | Value                                                       |
 | ---------- | ----------------------------------------------------------- |
 | Status     | Open · Done                                                 |
-| Type       | Data-profiling · Value-hypothesis · Technical/feasibility · UX · Integration |
+| Type       | Data-profiling · Hardware/load-profiling · Integration-behavior · Value-hypothesis · Technical/feasibility · UX |
 | Owner      | <name>                                                      |
 | Time-box   | <e.g. 4 hours / 1 day> — state it up front and honor it     |
 | Date       | <YYYY-MM-DD>                                                |
@@ -35,6 +41,11 @@ the real date range") *before* running the spike — a source that turns out emp
 synthetic doesn't fail loudly, it just validates vacuously and ships a wrong conclusion with
 a confident report around it. Note what you will deliberately *not* do (this is throwaway,
 not production).
+
+If that reality is a **separate machine** (a Pi, NAS, VM, lab box), clear the target-host
+access checklist first ([`00_WAYS_OF_WORKING.md` §6](../00_WAYS_OF_WORKING.md)) — SSH,
+name resolution, host-OS permissions and resource accounting are part of the time-box, and
+a measurement taken through a disabled counter reports confident zeros.
 
 ## 3. Findings
 

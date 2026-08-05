@@ -1,3 +1,8 @@
+---
+id:     DOC-ARCHITECTURE
+type:   standard
+status: Accepted
+---
 # Architecture
 
 | Field   | Value                                                       |

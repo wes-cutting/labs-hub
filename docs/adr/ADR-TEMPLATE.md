@@ -1,3 +1,9 @@
+---
+id:         ADR-<NNNN>  # REQUIRED · stable + typed, see 00_WAYS_OF_WORKING.md §4
+type:       adr
+status:     Proposed  # Proposed → Validated → Accepted → Superseded
+supersedes: <ADR-NNNN or omit>  # append-only: supersede, never edit
+---
 <!--
 ADR TEMPLATE — copy to docs/adr/ADR-XXXX-<slug>.md (next number).
 One decision per ADR. Append-only: supersede, don't edit. Status uses the ladder in

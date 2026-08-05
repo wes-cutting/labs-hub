@@ -1,5 +1,5 @@
 ---
-id: PRD
+id: DOC-PRD
 type: prd
 status: Proposed
 roadmap-item: —

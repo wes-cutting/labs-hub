@@ -13,7 +13,7 @@ roadmap-item: LH-S1
 | Status       | Implemented                                                          |
 | Owner        | wes-cutting                                                          |
 | Last updated | 2026-07-26                                                           |
-| Related      | PRD §3 goal 1–2, journeys 1–3 · [ADR-0001](adr/../adr/ADR-0001-os-and-container-runtime.md) · [ADR-0002](../adr/ADR-0002-service-data-and-state.md) · [ADR-0003](../adr/ADR-0003-hub-platform.md) · [SPIKE-05](../spikes/SPIKE-05-hub-platform-evaluation.md) |
+| Related      | PRD §3 goal 1–2, journeys 1–3 · [ADR-0001](../adr/ADR-0001-os-and-container-runtime.md) · [ADR-0002](../adr/ADR-0002-service-data-and-state.md) · [ADR-0003](../adr/ADR-0003-hub-platform.md) · [SPIKE-05](../spikes/SPIKE-05-hub-platform-evaluation.md) |
 
 > **Combined feature + UX spec** (right-sized per [Ways of Working §11](../00_WAYS_OF_WORKING.md) —
 > the hub is essentially one screen, the Homepage dashboard). UX flows + screen states are in §12.

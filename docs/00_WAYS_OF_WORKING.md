@@ -1,3 +1,8 @@
+---
+id:     DOC-WAYS-OF-WORKING
+type:   standard
+status: Accepted
+---
 # 00 — Ways of Working
 
 | Field   | Value                                                          |
@@ -49,6 +54,10 @@ Principles 1–5 in §2 are the direct fix for each of these five. Two further p
    throwaway spike. (Fix for #3.)
 4. **Validate the value, not just the build.** Prove the core hypothesis ("if we do X,
    the user gets Y") with a spike before building the machinery around it. (Fix for #4.)
+   *Where the value is intrinsic and near-unfalsifiable* — a homelab, a learning build,
+   self-tooling — there is no bet a spike can kill; don't stage a theatrical one. Move the
+   risk to **feasibility and scope discipline** instead
+   ([`../templates/DISCOVERY-GUIDE.md`](../templates/DISCOVERY-GUIDE.md) §3.3).
 5. **Decided ≠ validated.** Document status must distinguish a decision on paper from one
    checked against reality. (Fix for #5.)
 6. **Usable at every step.** "Is it usable / demoable yet?" is a first-class check on
@@ -103,18 +112,49 @@ Rule of thumb: the amount of code you may build on a document scales with its st
 
 ### Frontmatter (machine-readable identity)
 
-Every doc under `docs/` (plus each `templates/` file, as a worked example) carries a
-lightweight YAML frontmatter block, not only the prose meta-table above:
+Every doc under `docs/` carries a lightweight YAML frontmatter block, not only the prose
+meta-table above — and **so does every template that produces one**, pre-filled with that
+type's naming rule, so a doc copied from a template arrives already valid:
 
 ```yaml
 ---
-id: <stable-typed-id>       # e.g. FEAT-<roadmap-id>, ADR-0003, SPIKE-07, a status-report date+slug
+id: <PREFIX-slug>           # stable + typed — see the prefix table below
 type: <doc-type>            # feature-spec · ux-spec · spike · status-report · adr · standard · index · …
 status: <ladder value>      # the status ladder above
 roadmap-item: <id>          # cross-links to the roadmap's stable id (ROADMAP-TEMPLATE.md §3)
 supersedes: <id>            # ADRs/specs only — append-only, never edit a superseded doc
 ---
 ```
+
+**Every `id` is typed by its prefix, unique across the repo, and stable for the life of the
+doc** — the same stable-handle rule the roadmap uses for work items (`ROADMAP-TEMPLATE.md` §2),
+applied to documents. One prefix per `type`:
+
+| Prefix | For | Example |
+| ------ | --- | ------- |
+| `ADR-` | architecture decisions | `ADR-0007` |
+| `SPIKE-` | spike reports | `SPIKE-11` |
+| `FEAT-` | feature specs | `FEAT-envelope-transfers` |
+| `UX-` | UX specs | `UX-envelope-transfers` |
+| `SR-` | status reports | `SR-2026-08-03-s97` |
+| `REV-` | reviews, audits, initiatives | `REV-2026-07-12-roadmap-restructure` |
+| `DOC-` | everything else under `docs/` | `DOC-ROADMAP`, `DOC-SECURITY` |
+
+The point is that **the id, not the filename, is the identity**: `DOC-ROADMAP` stays
+`DOC-ROADMAP` when `03_ROADMAP.md` is renamed, re-sequenced or restructured. The gate
+validates that ids are unique, well-formed, and match their `type`.
+
+> **What this rule deliberately does *not* mean:** rewriting the prose to reference ids
+> instead of file paths. That would need a render step, which turns `docs/` into generated
+> output and contradicts *keep the frontmatter minimal and the prose primary* (below). Links
+> stay ordinary markdown links; **stability comes from the id plus a link check that fails
+> loudly the moment a rename breaks a reference** — which is what a rename actually needs.
+
+**When a gate starts enforcing a doc convention, the templates are part of that change — not
+a follow-up.** A convention that lives only in a process doc is one that gets skipped: the
+template is the only documentation most people actually read. Ship it the other way round and
+the person who followed the template *correctly* is the one who gets the red gate, holding a
+doc that was pre-broken before they typed a word.
 
 This is what turns "which roadmap item is this report?" from hand-work into something
 *generated*: a docs map, an artifact crosswalk, and a gate check can all be built **from**
@@ -123,10 +163,68 @@ the frontmatter instead of hand-authored and left to rot (closes the doc-index h
 this nudges the kit from *prose-first* toward *tooling-checked*, not the other way round;
 don't let the schema grow past what a gate check actually needs.
 
-A generator + validator implementing this (frontmatter validation + a generated crosswalk,
-wired into the gate so it fails on a missing/dangling `roadmap-item` or a stale crosswalk)
-lives in the budgeteer project as `scripts/check-docs.ts` (`npm run docs:check`) — port its
-*shape*, not its stack.
+**The kit ships this, runnable from commit zero:** [`scripts/check-docs.py`](../scripts/check-docs.py)
+(`python3 scripts/check-docs.py`), Python 3 stdlib only so it needs no stack, no package
+manifest and no install. It runs as its own always-on CI job in
+[`.github/workflows/gate.yml`](../.github/workflows/gate.yml) — separate from the
+stack-specific steps, which stay manual until wired — and has its own self-test
+([`scripts/test-check-docs.py`](../scripts/test-check-docs.py)), because a gate nobody has
+watched *fail* is an assertion about itself rather than a check. It validates frontmatter
+(ids unique, well-formed, matching their `type`), resolves links under the policy above, and
+catches the structural drift that rots docs quietly: ragged or header-less tables, gaps in
+section numbering, and a README file-tree block that no longer matches the repo.
+
+One thing it does that a naïve checker cannot: **a template's links are resolved from its
+copy destination, not its own location** (`TEMPLATE_DEST` in the script). A spike-report
+template lands in `docs/spikes/`, so its link to the spine is `../`, not `../docs/` — the
+constant-prefix bug called out below, made checkable.
+
+A richer variant — adding a generated artifact crosswalk and dangling `roadmap-item`
+detection — lives in the budgeteer project as `scripts/check-docs.ts` (`npm run docs:check`);
+port its *shape*, not its stack.
+
+**The docs check must resolve links, from the first version.** Frontmatter validation without
+a link check is an *Unasked-Question Gate* (§10) — it will print `OK` over a hundred broken
+links indefinitely. The policy has no safe default, so decide it explicitly:
+
+- **doc → doc: strict everywhere, no exception.** Every `.md` target must exist. A broken
+  doc link is always rot — including inside ADRs and other append-only records, because
+  append-only protects the *decision*, not a wrong path.
+- **doc → code: strict in docs describing the current system; permitted in dated records**
+  (status reports, spikes, reviews) — a snapshot's code references *should* rot, since the
+  code moved and rewriting the record to chase it falsifies it. But **print every permitted
+  one on each run**, so the exception stays a visible, bounded list rather than a hole.
+
+Two lexical rules any real repo needs: **skip fenced code blocks** (kickoff prompts and
+examples are sample text, not references), and treat a trailing `:227` as a **line reference**
+— strip it before resolving, so the file itself still gets checked.
+
+Two things this buys, both observed: a rename becomes a **worklist the gate produces for you**
+instead of a grep-and-hope exercise. And one thing it can never buy — **a link check verifies
+that a path resolves, never that it resolves to what the author meant**, so reusing a retired
+document's filename is its blind spot: every stale reference keeps resolving, silently, to
+different content.
+
+**Renaming a doc — and the one part no gate can check.** A rename that gives the replacement
+a *new* name is fully handled by the tooling: the check turns what would have been a
+grep-and-hope exercise into a worklist, naming every broken link before you fix one. But
+**reusing a retired document's name is invisible to every link checker, because nothing
+breaks.** Old references keep resolving — to a file whose sections are now arranged
+differently, or whose content moved to a sibling. Green links, wrong destination. So:
+
+- **Prefer not to reuse a retired name.** If the replacement can keep its own name, every
+  stale reference stays *visibly* stale instead of quietly wrong.
+- **When reuse is the point** — the unsuffixed name is sometimes the actual deliverable — the
+  rename is not done until the prose says so in **both** directions: the new occupant states
+  that pre-cutover references to this name meant the deleted file, and whichever doc inherited
+  the old content states where it came from and when the original was deleted. Treat that as a
+  required step of the rename, exactly like updating the tooling. It is the only part of a
+  name-reuse rename that nothing can check for you.
+
+A generator that *emits* links must take its output location as an input: the relative prefix
+is a function of the file being written, never a constant. The largest single source of broken
+links in the reference implementation was the generator the gate itself blessed, emitting one
+hard-coded `../` prefix into two output files at different depths.
 
 **Which states apply to which artifact** (not every status fits every doc):
 
@@ -173,8 +271,32 @@ Rules:
   is not promoted to production; its *findings* are.
 - Produces a [Spike Report](../templates/SPIKE-REPORT-TEMPLATE.md) that explicitly says
   what it **confirmed**, what it **invalidated**, and the **recommended decision**.
-- The first spike of any data-driven project is a **data-profiling spike** against the
-  real source. The first spike of any product bet is a **value-hypothesis spike**.
+- **The first spike is a reality-profiling spike** — a first honest look at whatever this
+  project's reality actually *is*. Pick the variant that matches:
+  - **data-profiling** — a data-driven project: profile the real source.
+  - **hardware/load-profiling** — an infrastructure/assembly project: profile the real box
+    under the real workload. There is no dataset here; the hardware is the reality.
+  - **integration-behavior** — a project resting on a third party: profile the real API's
+    actual behavior, not its documentation.
+  - **value-hypothesis** — a product bet: the cheapest real test of the bet itself.
+
+**When the reality is a separate machine** (a Pi, a NAS, a VM, a lab box), reaching it is
+real work that happens *before* any measurement — and it is routinely unbudgeted. Clear
+these as part of the time-box, not as a surprise inside it:
+
+- **SSH on and non-interactive.** It ships disabled on some images, and an agent run stalls
+  forever on a password prompt — set up key-based auth first.
+- **A name that actually resolves.** mDNS `.local` fails on plenty of networks; keep the IP
+  (via an ARP scan) as the fallback, and put the reachable name in *one* configurable place
+  so it isn't hard-coded across the repo.
+- **The host OS can block the agent silently.** macOS's per-app **Local Network** permission
+  will stop a browser from reaching a LAN address while `curl` on the same machine succeeds.
+  A tool that "can't connect" may be facing a permission, not a network.
+- **Resource accounting has to be switched on.** Measuring is the whole point, and it can be
+  off by default: Raspberry Pi OS ships with the **memory cgroup disabled**, so `docker
+  stats` reports 0 B and memory limits silently do nothing until `cgroup_enable=memory
+  cgroup_memory=1` is set and the box rebooted. A spike that measures through a disabled
+  counter reports confident zeros.
 
 > Most painful integrations are a short, honest look at the real input away from being
 > avoided. The spike is the cheapest insurance we have.
@@ -233,7 +355,26 @@ executes a flawed plan flawlessly:
 - **The human reviews planning docs early**, at the start of each phase, not just the
   output. (Reviewing the plan is what catches "no UI is being built" immediately.)
 - **"Is it usable yet?"** is asked at every increment by both parties.
-- **Surprises become spikes**, not silent workarounds.
+- **One slice per session — stop at the slice boundary and report.** A session builds
+  **exactly one** roadmap item, writes its status report, and **stops for review** — even when
+  the next item is obvious, unblocked, and there is context to spare. Finishing early is a
+  reason to report, not to continue. The point is that the human sees each slice while it is
+  still cheap to redirect: a session that lands five slices has made four decisions nobody
+  reviewed, and unwinding the first now means unwinding all five. **A kickoff prompt listing
+  several items describes the *order*, not permission** — if a slice turns out to be trivial,
+  report it and let the human say "keep going" rather than assuming it. The cost here is not
+  the code, which may be perfectly good and gate-green; it is that a breaking decision buried
+  in slice one only surfaces after four more were built on top of it.
+- **Surprises become spikes**, not silent workarounds. **And before you pin a surprise with a
+  test or a runbook entry, decide whether it is behaviour or a bug.** The reflex — assert it
+  so the runbook "cannot drift", document it under *"things that will bite you"* — is exactly
+  right for a constraint and exactly wrong for a defect, and both artifacts then actively
+  defend it: a harness check written to broken behaviour **goes red when someone fixes the
+  bug**, and the next person reading that failure has every reason to conclude the *fix* is
+  the regression. A documented trap also reads as a decision somebody made. **Pin what you
+  want to be true; file what you don't.** If it can't be decided within the slice, the honest
+  artifact is a ⚠ carry naming the open question — **not** a green assertion. A passing test
+  is a statement of intent, not merely of fact.
 - **Close out each block with a Definition-of-Done snapshot.** At the end of every executed
   block — a spike, a vertical slice, or a phase — write a dated
   [status report](../templates/STATUS-REPORT-TEMPLATE.md) whose **outline is the Definition
@@ -243,6 +384,17 @@ executes a flawed plan flawlessly:
   summary. Anything not done stays visible (⚠ + reason + owner) so a snapshot never
   overstates "done." This is what makes hand-offs between sessions/context windows clean and
   honest — and it doubles as the per-block review record.
+- **Hand over the two artifacts that actually merge the work.** A status report says what
+  happened; it doesn't land the change. With it, produce **(1) a single-line Conventional
+  Commit message** and **(2) a PR description filled into
+  [`../.github/PULL_REQUEST_TEMPLATE.md`](../.github/PULL_REQUEST_TEMPLATE.md)** — written
+  out, ready to paste, right-sized to the change (a one-line docs fix gets a commit line and
+  nothing more). **Fill it honestly:** a check that genuinely doesn't apply is marked **n/a
+  with its reason**, never quietly ticked to make the list look complete, and anything
+  deferred is named under *Carries / follow-ups*. The value is in the timing — filling the
+  DoD checklist **while the work is fresh** surfaces the box you can't honestly tick at the
+  moment you can still do something about it, rather than at review, when the incentive is
+  to tick it and move on.
 - **End each milestone handoff-ready, with the next session's kickoff prompt.** When a
   roadmap item reaches `Done`, the project must be resumable cold: gate green, docs updated,
   the status report's **Resume here** current. Close that report with a **copy-pasteable
@@ -278,6 +430,16 @@ executes a flawed plan flawlessly:
 - **Documented-but-Unwired Gate** — a DoD/CI that lists lint, e2e, or a11y the scaffold never
   shipped runnable, so "the gate" overstates enforced rigor. (Ship it runnable from commit
   zero — the False-Certainty anti-pattern applied to tooling.)
+- **Unasked-Question Gate** — a step that *is* wired, *does* run, and is green over a scope
+  nobody ever checked: a typecheck whose `include` never named a directory, an accessibility
+  suite over pages it has never loaded, a docs check that validates frontmatter but resolves
+  no link, a "p95" assertion that is arithmetically the maximum, a test suite that only ever
+  exercises the app *after* someone provisioned the first login out of band. The green is
+  real, and it means far less than it looks like it means. **A gate's coverage is exactly the
+  set of properties it checks** — and nothing reports the complement, so coverage has to be
+  audited mechanically rather than reasoned about
+  ([`TESTING_STRATEGY.md`](TESTING_STRATEGY.md) §3). The sharper sibling of
+  *Documented-but-Unwired*: there the gate was missing; here it was asked the wrong question.
 
 ---
 

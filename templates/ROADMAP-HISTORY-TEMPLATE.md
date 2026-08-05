@@ -1,3 +1,8 @@
+---
+id:     DOC-ROADMAP-HISTORY  # REQUIRED · stable + typed, see 00_WAYS_OF_WORKING.md §4
+type:   roadmap-history
+status: Append-only  # never rewritten, only added to
+---
 <!--
 ROADMAP HISTORY TEMPLATE — copy to docs/03_ROADMAP-HISTORY.md, as the append-only sibling
 of docs/03_ROADMAP.md (from ROADMAP-TEMPLATE.md). K31: split out of the living plan so
@@ -11,7 +16,7 @@ the small, scannable "what's next" plan. Cross-linked by id (see ROADMAP-TEMPLAT
 | ------ | ------------ |
 | Status | Append-only  |
 | Owner  | <name>       |
-| Plan   | [`03_ROADMAP.md`](03_ROADMAP.md) — the living plan this history belongs to |
+| Plan   | `03_ROADMAP.md` (`DOC-ROADMAP`) — the living plan this history belongs to; make it a link once both files exist |
 
 Never edit past entries; append a new one. This doc only grows.
 

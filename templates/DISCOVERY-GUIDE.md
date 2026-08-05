@@ -78,6 +78,14 @@ Move through these themes in order. Each maps to something the kit does downstre
 - **This is the assumption most often never tested** (failure #4 in
   [`ORIGIN.md`](../ORIGIN.md)). If it can be cheaply exercised before building around it,
   that's the **value-hypothesis spike**.
+- **If the value is intrinsic and near-unfalsifiable, name it as such and move on.**
+  Homelab, learning, and self-tooling projects are valuable largely *for the journey* —
+  control, understanding, customization — and no spike will falsify that. Don't burn a
+  spike pretending otherwise. Record it as intrinsic, then put the risk where it actually
+  lives: **feasibility** (can this hardware/stack do the thing at all?) and **scope
+  discipline** (§3.5 — push hard on non-goals, because nothing external will stop the scope
+  growing). Mirrored in [`00_WAYS_OF_WORKING.md` §2](../docs/00_WAYS_OF_WORKING.md)
+  principle 4.
 
 ### 3.4 Riskiest assumptions & unknowns → *spikes, sequencing*
 - What does this depend on that **nobody has directly looked at** — a legacy/external data
@@ -98,6 +106,10 @@ Move through these themes in order. Each maps to something the kit does downstre
 - **Compliance / legal:** any regime that constrains the design?
 - **Stack leanings & constraints:** existing systems, team skills, hosting, integrations
   that bound the choice (record as input to `ADR-0001`, not as a decision).
+- **Target-host access** (when the reality is a *separate machine* — a Pi, NAS, VM, lab
+  box): how will the agent actually reach it? SSH enabled, key-based and non-interactive, a
+  name that resolves. Budget it — it is never zero, and it lands before the first
+  measurement (checklist in [`00_WAYS_OF_WORKING.md` §6](../docs/00_WAYS_OF_WORKING.md)).
 - **Timeline, team, budget:** what's the real shape of the effort?
 - **Non-functional needs:** latency, volume, availability expectations (seed the NFR doc).
 - **Calendar-date semantics:** if any entity has a date the user thinks of as a *day* (not
@@ -120,11 +132,17 @@ surface in §3.3–3.4, convert each into a one-line spike candidate:
 > PRD §5*
 > *SPIKE (data-profiling): does the legacy export reconcile from its own line items? —
 > blocks the data model*
+> *SPIKE (hardware/load-profiling): does the target box hold realtime under the real
+> workload? — blocks the stack ADR*
 
 Rules of thumb (full detail in [§6](../docs/00_WAYS_OF_WORKING.md)):
-- The first spike of a **data-driven** project is a **data-profiling** spike on the real
-  source.
-- The first spike of a **product bet** is a **value-hypothesis** spike.
+- **The first spike is a reality-profiling spike.** Pick the variant that matches what this
+  project's reality *is*: **data-profiling** (a real source), **hardware/load-profiling** (a
+  real box under real load), **integration-behavior** (a real third party's actual behavior),
+  or **value-hypothesis** (a real product bet).
+- **Don't reach for a dataset that doesn't exist.** An infrastructure/assembly project has
+  no source to profile — its reality check is the hardware under load. Nudging it toward a
+  data spike wastes the first, most valuable investigation.
 - A spike answers **one** falsifiable question. More than one question is more than one
   spike.
 
@@ -135,7 +153,9 @@ Each candidate becomes a [Spike Report](SPIKE-REPORT-TEMPLATE.md) when it runs.
 Stop the conversation and write up the intake when **all** of these hold:
 
 - [ ] The **problem** and **users** are stated in the human's own words.
-- [ ] The **value hypothesis** is written as one falsifiable sentence.
+- [ ] The **value hypothesis** is written as one falsifiable sentence — *or* explicitly
+      named as intrinsic/near-unfalsifiable, with the risk moved to feasibility and
+      non-goals (§3.3).
 - [ ] The **riskiest assumptions** are listed, each with a cheapest-validation idea.
 - [ ] At least the **first spike** is named (type + the question it answers).
 - [ ] **Non-goals** exist (scope has an edge).

@@ -1,3 +1,8 @@
+---
+id:     DOC-SECURITY
+type:   standard
+status: Accepted
+---
 # Security Baseline
 
 | Field   | Value                                                  |
@@ -24,6 +29,13 @@ own ADRs but never weakens the baseline below.
 > If confidential data ever does land in history, scrubbing it requires a history
 > rewrite — expensive and error-prone. The guardrail belongs in the scaffold, not in a
 > spec written later.
+
+**A build context is a second exfiltration path, and `.gitignore` does not guard it.** The
+files sent to an image build are a separate list from the files under source control, and the
+resulting image gets *published*. Write that ignore file **deny-by-default** — `*` first, then
+explicit allow-rules for exactly the build inputs — so a confidential file added later is
+excluded automatically rather than shipping until someone remembers a rule
+([`DEPLOYMENT.md`](DEPLOYMENT.md) §2).
 
 ### ETL / bulk-import artifacts are two grades — plan the split when the ETL starts
 

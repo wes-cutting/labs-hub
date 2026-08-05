@@ -1,7 +1,7 @@
 # ============================================================================
 # CI gate — labs-hub. Wired to the stack (ADR-0001: Docker/Compose infra).
 # Mirrors the local gate (`make gate`), same checks/order:
-#   lint (yamllint) -> validate (docker compose config) -> shellcheck
+#   lint (yamllint) -> validate (docker compose config) -> shellcheck -> docs
 #
 # Notes:
 #   - No app code yet (LH-S1 is assemble-and-configure), so there is no typecheck/
@@ -46,3 +46,12 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
           shellcheck scripts/*.sh
+
+      # Docs gate — carried from the baseline kit. Python 3 stdlib only, so there is
+      # nothing to install. Its self-test runs first: a gate nobody has watched fail is
+      # an assertion about itself. Policy: docs/00_WAYS_OF_WORKING.md §4.
+      - name: docs gate — self-test
+        run: python3 scripts/test-check-docs.py
+
+      - name: docs gate — frontmatter + links + structure
+        run: python3 scripts/check-docs.py

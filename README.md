@@ -43,7 +43,7 @@ Chosen per project via ADRs (see [`docs/adr/`](docs/adr/)):
 | OS | 64-bit Raspberry Pi OS (Debian 12 Bookworm) | [`ADR-0001`](docs/adr/ADR-0001-os-and-container-runtime.md) — **Validated** |
 | Orchestration | Docker Engine + Compose plugin | [`ADR-0001`](docs/adr/ADR-0001-os-and-container-runtime.md) — **Validated** |
 | Service data / state | Single data-root, bind mounts, likely external SSD | [`ADR-0002`](docs/adr/ADR-0002-service-data-and-state.md) — **Proposed** (medium/backup/encryption not yet spiked) |
-| Gate | `make gate` (yamllint + `docker compose config` + shellcheck) + smoke; CI in `.github/workflows/gate.yml` | wired (LH-S1) |
+| Gate | `make gate` (yamllint + `docker compose config` + shellcheck + **docs**) + smoke; CI in `.github/workflows/gate.yml` | wired (LH-S1); docs gate added with kit pass 4 |
 | Hub | Homepage (launcher/catalog/health) + Portainer (lifecycle/metrics), in `deploy/` | [ADR-0003](docs/adr/ADR-0003-hub-platform.md) — **Validated** |
 | Custom services | Built in the app's own CI → GHCR (ARM64), **pulled** by the Pi and pinned by digest; state in a Postgres container on the data-root | exercised by LH-S3-demo; `ADR-0004` deliberately not yet written (*decided ≠ validated*) |
 

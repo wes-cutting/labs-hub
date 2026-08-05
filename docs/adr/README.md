@@ -1,3 +1,8 @@
+---
+id:     DOC-ADR-INDEX
+type:   index
+status: Living
+---
 # Architecture Decision Records
 
 The index of decisions for this project. One decision per ADR; **append-only** (to change

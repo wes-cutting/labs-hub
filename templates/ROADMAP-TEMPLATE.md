@@ -1,3 +1,8 @@
+---
+id:     DOC-ROADMAP  # REQUIRED · stable + typed, see 00_WAYS_OF_WORKING.md §4
+type:   roadmap
+status: Living  # the plan of record is never 'done'
+---
 <!--
 ROADMAP TEMPLATE — copy to docs/03_ROADMAP.md. The living plan of record: the ordered
 backlog of spikes and vertical slices, sequenced by uncertainty and value (NOT by layer).
@@ -17,7 +22,7 @@ ROADMAP-HISTORY-TEMPLATE.md), so this doc never bloats under its own history.
 | Status        | Living                                 |
 | Owner         | <name>                                 |
 | Last updated  | <YYYY-MM-DD>                           |
-| History       | [`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md) — re-sequencing log + done/shipped ledger |
+| History       | `03_ROADMAP-HISTORY.md` (`DOC-ROADMAP-HISTORY`) — re-sequencing log + done/shipped ledger; make it a link once both files exist |
 | Sources       | [`01_INTAKE.md`](../docs/01_INTAKE.md) · [`02_PRD.md`](../templates/PRD-TEMPLATE.md) |
 
 **Current focus:** one line a cold reader (or agent) can resume from — the slice or spike
@@ -29,7 +34,7 @@ in flight right now and what "done" looks like for it.
 
 - **The plan of record, kept live.** This is *the* ordered list of what we build next and
   why. Update item statuses as work lands; re-sequence (and log it in the sibling
-  [history doc](03_ROADMAP-HISTORY.md)) when a spike changes what we know. A point-in-time
+  history doc `03_ROADMAP-HISTORY.md`) when a spike changes what we know. A point-in-time
   snapshot for hand-offs is the
   [Status Report](../templates/STATUS-REPORT-TEMPLATE.md) — different artifact, different
   job.
@@ -118,7 +123,7 @@ spike or one slice.
 
 | Id | Item | Kind | Value | Risk | Answers (the question) | Status | Spike report |
 | -- | ---- | ---- | ----- | ---- | ---------------------- | ------ | ------------ |
-| SPIKE-01 | <value-hypothesis / data-profiling spike> | spike | High | High | <one falsifiable question> | Planned | `spikes/01-<slug>.md` |
+| SPIKE-01 | <reality-profiling spike — data / hardware-load / integration-behavior / value-hypothesis> | spike | High | High | <one falsifiable question> | Planned | `spikes/01-<slug>.md` |
 
 ### Domain slices
 
@@ -140,7 +145,7 @@ spike or one slice.
 
 The **re-sequencing log** (why the order changed) and the **done/shipped ledger**
 (completed items, newest first) are append-only and live in the sibling
-[`03_ROADMAP-HISTORY.md`](03_ROADMAP-HISTORY.md), from
-[`ROADMAP-HISTORY-TEMPLATE.md`](ROADMAP-HISTORY-TEMPLATE.md) — kept separate so this living
+`03_ROADMAP-HISTORY.md`, from
+[`ROADMAP-HISTORY-TEMPLATE.md`](../templates/ROADMAP-HISTORY-TEMPLATE.md) — kept separate so this living
 plan never bloats under its own history. Append an entry there whenever a spike, surprise,
 or new constraint moves, defers, or drops an item, and whenever an item ships.
